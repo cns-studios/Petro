@@ -43,10 +43,10 @@ def shop():
     "------------------------------",
     "Money:"+str(money)+"$",
     "",
-    "1.)  "+str(upgrade_pack)+" Upgrade Pack available                  3$",
-    "2.)  "+str(buff_pack)+" Buff Pack available                     4$",
-    "3.)  "+str(charakter_pack)+" Charakter Pack available                8$",
-    "4.)  "+str(legendary_upgrade_pack)+" Legendary Upgrade Pack available        10$",
+    "1.)  "+str(upgrade_pack)+" Upgrade Pack available                   3$",
+    "2.)  "+str(buff_pack)+" Buff Pack available                      4$",
+    "3.)  "+str(charakter_pack)+" Charakter Pack available                 8$",
+    "4.)  "+str(legendary_upgrade_pack)+" Legendary Upgrade Pack available         10$",
     ]
     for line in liness:
         print(line)
