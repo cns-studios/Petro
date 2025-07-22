@@ -237,7 +237,7 @@ for i in range(5):
             r = 0.01
 print("")
 print("Loading finished!")
-time.sleep(1.5)
+time.sleep(1)
 main_menu()
 
 
