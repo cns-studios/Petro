@@ -2,7 +2,7 @@ import time
 import random 
 import sys
 import os
-from Charaters_Card_Game import wurm_stats,ant_stats
+from Charaters_Card_Game import worm_stats,anaconda_stats,ant_stats,rat_stats,snail_stats,spider_stats,bee_stats, stag_beetle_stats, cat_stats
 
 
 
@@ -11,10 +11,20 @@ shop_refresh_price = 5
 tss = 1.5                               # wartezeit zwischen nachricht und hauptmenu
 money = 50000
 stage = 1
-Inventory = ["Wurm", "Ant"]
+Inventory = ["Worm"]
+common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle"]
+rare_pets = ["Cat"]
+legendary_pets = ["Anaconda"]
 pet_levels = {
-    "Wurm": 1,
+    "Worm": 1,
     "Ant": 1,
+    "Rat": 1,
+    "Snail": 1,
+    "Spider": 1,
+    "Bee": 1,
+    "Stag Beetle": 1,
+    "Cat": 1,
+    "Anaconda": 1,
 
 
 
@@ -46,7 +56,7 @@ def Fight():
 
     
 def shop():
-    global money, upgrade_pack, buff_pack, charakter_pack, legendary_upgrade_pack, shop_refresh_price
+    global money, upgrade_pack, buff_pack, charakter_pack, legendary_upgrade_pack, shop_refresh_price, r_p
     liness = [
     "-------------Shop-------------",
     "Money:"+str(money)+"$",
@@ -104,6 +114,25 @@ def shop():
             if money > 7:
                 money -= 8
                 charakter_pack -= 1
+                c_r_l = random.randint(0,100)
+                if c_r_l > 89:
+                    r_p = random.choice(rare_pets)
+                    Inventory.append(r_p)
+                    rare_pets.remove(r_p)
+                    print(f"You have got a rare {r_p}.")
+                    wait = input("")
+                elif c_r_l < 5:
+                    r_p = random.choice(legendary_pets)
+                    Inventory.append(r_p)
+                    legendary_pets.remove(r_p)
+                    print(f"You have got a legendary {r_p}.")
+                    wait = input("")
+                else:
+                    r_p = random.choice(common_pets)
+                    Inventory.append(r_p)
+                    common_pets.remove(r_p)
+                    print(f"You have got a common {r_p}.")
+                    wait = input("")
                 shop()
             else:
                 print("not enough Money")
@@ -225,7 +254,7 @@ main_menu()
 # Pets passive Fähigkeiten: Z. B. 1 Dollar für Beenden eines Levels, 5 % mehr Schaden für alle Common-Pets etc.
 # 30 Pets (vorerst) adden
 #shop reset price nach jesder runde wieder auf 5
-#
+#dodge chance hinzufügen: z.b biene hat sehr hohe dodje wahrscheinlichkeit. und hat so 20% wahrscheinlichkeit das die gegbnerische attacke nicht hittet
 #
 #
 #
