@@ -1,6 +1,19 @@
-
-
 level_multiplayer = 1
+common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle"]
+rare_pets = ["Cat"]
+legendary_pets = ["Anaconda"]
+pet_levels = {
+    "Worm": 1,
+    "Ant": 1,
+    "Rat": 1,
+    "Snail": 1,
+    "Spider": 1,
+    "Bee": 1,
+    "Stag Beetle": 1,
+    "Cat": 1,
+    "Anaconda": 1,
+}
+cp = len(common_pets)
 
 # starter
 worm_stats = {"attack": 1 * level_multiplayer, "hp": 10 * level_multiplayer, "rarity": 0}

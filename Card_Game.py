@@ -2,9 +2,7 @@ import time
 import random 
 import sys
 import os
-from Charaters_Card_Game import worm_stats,anaconda_stats,ant_stats,rat_stats,snail_stats,spider_stats,bee_stats, stag_beetle_stats, cat_stats
-
-
+from Charaters_Card_Game import *
 
 
 shop_refresh_price = 5
@@ -12,32 +10,6 @@ tss = 1.5                               # wartezeit zwischen nachricht und haupt
 money = 50000
 stage = 1
 Inventory = ["Worm"]
-common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle"]
-rare_pets = ["Cat"]
-legendary_pets = ["Anaconda"]
-pet_levels = {
-    "Worm": 1,
-    "Ant": 1,
-    "Rat": 1,
-    "Snail": 1,
-    "Spider": 1,
-    "Bee": 1,
-    "Stag Beetle": 1,
-    "Cat": 1,
-    "Anaconda": 1,
-
-
-
-
-
-
-
-
-
-
-
-
-}
 
 def roll_packs(anzahl, chance):
     return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
@@ -115,23 +87,26 @@ def shop():
                 money -= 8
                 charakter_pack -= 1
                 c_r_l = random.randint(0,100)
-                if c_r_l > 89:
+                if c_r_l > 94:
                     r_p = random.choice(rare_pets)
                     Inventory.append(r_p)
                     rare_pets.remove(r_p)
                     print(f"You have got a rare {r_p}.")
                     wait = input("")
-                elif c_r_l < 5:
+                elif c_r_l < 11:
                     r_p = random.choice(legendary_pets)
                     Inventory.append(r_p)
                     legendary_pets.remove(r_p)
                     print(f"You have got a legendary {r_p}.")
                     wait = input("")
                 else:
-                    r_p = random.choice(common_pets)
-                    Inventory.append(r_p)
-                    common_pets.remove(r_p)
-                    print(f"You have got a common {r_p}.")
+                    if len(common_pets) > 0:
+                        r_p = random.choice(common_pets)
+                        Inventory.append(r_p)
+                        common_pets.remove(r_p)
+                        print(f"You have got a common {r_p}.")
+                    else:
+                        print(f"You already own all {cp} common Pets")
                     wait = input("")
                 shop()
             else:
