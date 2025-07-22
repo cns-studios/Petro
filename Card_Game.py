@@ -19,6 +19,7 @@ legendary_upgrade_pack = roll_packs(5, 20)       # 0.25 also alle 4 shops
 charakter_pack = roll_packs(3, 9)               # 0.3 alle 3 shops
 buff_pack = roll_packs(10, 2)                      # 2.5 packs pro shop
     
+
 def Fight():
     dubble_check = input("You are fighting on stage "+ str(stage)+". Are you sure you want to fight? N/Y")
     if dubble_check == "Y":
@@ -26,6 +27,15 @@ def Fight():
     else:
         main_menu()
 
+def Inventory_function():
+    print("Your Inventory:")
+    print(", ".join([f"{pet} (Lv.{pet_levels.get(pet, 1)})" for pet in Inventory]))
+    user_Request = input()
+    if user_Request in Inventory:
+        print(all_pet_stats[user_Request])
+        Inventory_function()
+    else:
+        main_menu()
     
 def shop():
     global money, upgrade_pack, buff_pack, charakter_pack, legendary_upgrade_pack, shop_refresh_price, r_p
@@ -163,7 +173,10 @@ def shop():
 
 def main_menu():
     global money
+    level_update()
     
+    
+
    
     lines = [
         "------------------------------",
@@ -187,10 +200,7 @@ def main_menu():
     print("------------------------------")
     
     if user_Request == "i":
-        print("Your Inventory:")
-        print(",".join([f"{pet} (Lv.{pet_levels.get(pet, 1)})" for pet in Inventory]))
-        wait = input()  
-        main_menu()
+       Inventory_function()
     elif user_Request == "f":
         Fight()
     elif user_Request == "s":
@@ -202,28 +212,28 @@ def main_menu():
         time.sleep(tss)
         main_menu()
 print("")
-print(f"{cp} Charakters werden geladen")
+print(f"56 Charakters werden geladen")
 time.sleep(2)
 r = 0.3
 for i in range(5):
     llines = [
-        "Lade Modul: kernel32.dll",
-    "Initialisiere Subsystem...",
-    "Verbinde mit localhost:8080",
-    "Starte Deep Scan...",
-    "Lese Konfiguration: config.sys",
-    "Aktiviere Sicherheitsprotokolle",
-    "Speichere Cache...",
-    "Analysiere Datenströme...",
-    "Verschlüssle temporäre Dateien...",
-    "Starte Prozess: ghost_worker.exe",
-    "Installiere Debug-Patch",
-    "Starte Selbstdiagnose...",
-    "Verbindung zu 127.0.0.1 erfolgreich",
-    "Sync mit Server-Zeit",
-    "Prüfe Abhängigkeiten...",
-    "Baue Projektstruktur...",
-    "Initialisierung abgeschlossen "
+        "Loading module: kernel32.dll",
+    "Initializing subsystem...",
+    "Connecting to localhost:8080",
+    "Starting deep scan...",
+    "Reading configuration: config.sys",
+    "Activating security protocols",
+    "Saving cache...",
+    "Analyzing data streams...",
+    "Encrypting temporary files...",
+    "Starting process: ghost_worker.exe",
+    "Installing debug patch",
+    "Starting self-diagnosis...",
+    "Connection to 127.0.0.1 successful",
+    "Syncing with server time",
+    "Checking dependencies...",
+    "Building project structure...",
+    "Initialization complete"
     
     ]
     
