@@ -201,7 +201,43 @@ def main_menu():
         print("")
         time.sleep(tss)
         main_menu()
-
+print("")
+print(f"{cp} Charakters werden geladen")
+time.sleep(2)
+r = 0.3
+for i in range(5):
+    llines = [
+        "Lade Modul: kernel32.dll",
+    "Initialisiere Subsystem...",
+    "Verbinde mit localhost:8080",
+    "Starte Deep Scan...",
+    "Lese Konfiguration: config.sys",
+    "Aktiviere Sicherheitsprotokolle",
+    "Speichere Cache...",
+    "Analysiere Datenströme...",
+    "Verschlüssle temporäre Dateien...",
+    "Starte Prozess: ghost_worker.exe",
+    "Installiere Debug-Patch",
+    "Starte Selbstdiagnose...",
+    "Verbindung zu 127.0.0.1 erfolgreich",
+    "Sync mit Server-Zeit",
+    "Prüfe Abhängigkeiten...",
+    "Baue Projektstruktur...",
+    "Initialisierung abgeschlossen "
+    
+    ]
+    
+    
+    for line in llines:
+        print(line)
+        time.sleep(r)  
+        if r > 0.01:
+            r -= 0.01
+        else:
+            r = 0.01
+print("")
+print("Loading finished!")
+time.sleep(1.5)
 main_menu()
 
 
