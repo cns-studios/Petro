@@ -254,12 +254,6 @@ main_menu()
 # Pets passive Fähigkeiten: Z. B. 1 Dollar für Beenden eines Levels, 5 % mehr Schaden für alle Common-Pets etc.
 # 30 Pets (vorerst) adden
 #shop reset price nach jesder runde wieder auf 5
-#dodge chance hinzufügen: z.b biene hat sehr hohe dodje wahrscheinlichkeit. und hat so 20% wahrscheinlichkeit das die gegbnerische attacke nicht hittet
-#
-#
-#
-
-
 
 
 
