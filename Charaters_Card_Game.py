@@ -130,7 +130,7 @@ crocodile_stats = {"attack": 55 * level_multiplayer, "hp": 100 * level_multiplay
 lion_stats = {"attack": 48 * level_multiplayer, "hp": 75 * level_multiplayer, "rarity": 3, "dodge_chance": 4}
 bear_stats = {"attack": 38 * level_multiplayer, "hp": 120 * level_multiplayer, "rarity": 3, "dodge_chance": 3}
 falcon_stats = {"attack": 32 * level_multiplayer, "hp": 40 * level_multiplayer, "rarity": 3, "dodge_chance": 25}
-python_stats = {"attack": 28 * level_multiplayer, "hp": 85 * level_multiplayer, "rarity": 3, "dodge_chance": 0}
+python_stats = {"attack": 28 * level_multiplayer, "hp": 85 * level_multiplayer, "rarity": 3, "dodge_chance": 9}
 komodo_dragon_stats = {"attack": 40 * level_multiplayer, "hp": 70 * level_multiplayer, "rarity": 3, "dodge_chance": 2}
 elephant_stats = {"attack": 30 * level_multiplayer, "hp": 150 * level_multiplayer, "rarity": 3, "dodge_chance": 0}
 
