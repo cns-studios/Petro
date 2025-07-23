@@ -116,7 +116,7 @@ def shop():
                         common_pets.remove(r_p)
                         print(f"You have got a common {r_p}.")
                     else:
-                        print(f"You already own all {cp} common Pets")
+                        print(f"You already own all 20 common Pets")
                     wait = input("")
                 shop()
             else:

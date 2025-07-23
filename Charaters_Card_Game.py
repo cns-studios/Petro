@@ -4,7 +4,7 @@ level_multiplayer = 1
 
 
 
-common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Cricket", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
+common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
 
 rare_pets = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal"]
 
@@ -18,7 +18,6 @@ pet_levels = {
     "Spider": 1,
     "Bee": 1,
     "Stag Beetle": 1,
-    "Cricket": 1,
     "Grasshopper": 1,
     "Ladybug": 1,
     "Butterfly": 1,
@@ -145,7 +144,6 @@ all_pet_stats = {
     "Spider": spider_stats,
     "Bee": bee_stats,
     "Stag Beetle": stag_beetle_stats,
-    "Cricket": cricket_stats,
     "Grasshopper": grasshopper_stats,
     "Ladybug": ladybug_stats,
     "Butterfly": butterfly_stats,
