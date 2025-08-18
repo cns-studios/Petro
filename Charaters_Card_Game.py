@@ -10,8 +10,8 @@ rare_pets = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "
 
 legendary_pets = ["Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon", "Python","Komodo Dragon", "Elephant"]
 
-pet_leWormvels = {
-    "": 1,
+pet_levels = {
+    "Worm": 1,
     "Ant": 1,
     "Rat": 1,
     "Snail": 1,
