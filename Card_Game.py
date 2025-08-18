@@ -52,7 +52,7 @@ def shop():
     for line in liness:
         print(line)
         time.sleep(0.03)
-    shop_packs = input("UP, BP,CP, LUP, RS or Main Menu?: ").lower()
+    shop_packs = input("1, 2,3, 4, r or Main Menu?: ").lower()
     if shop_packs == "m":
         main_menu()
     elif shop_packs == "up":
@@ -63,6 +63,9 @@ def shop():
                 upgrade = random.choice(Inventory)
                 if upgrade in pet_levels:
                     pet_levels[upgrade] += 1
+                    if upgrade in all_pet_stats:
+                        all_pet_stats[upgrade]["attack"] += all_pet_stats[upgrade]["rarity"] 
+                        all_pet_stats[upgrade]["hp"] += all_pet_stats[upgrade]["rarity"] 
                     print(f"you have upgraded {upgrade} to Level {pet_levels[upgrade]}")
                 wait = input()
                 shop()
@@ -136,6 +139,11 @@ def shop():
                 upgrade = random.choice(Inventory)
                 if upgrade in pet_levels:
                     pet_levels[upgrade] += 5
+                    if upgrade in all_pet_stats:
+                        all_pet_stats[upgrade]["attack"] += all_pet_stats[upgrade]["rarity"] * 5 
+                        all_pet_stats[upgrade]["hp"] += all_pet_stats[upgrade]["rarity"] * 5
+
+                    
                     print(f"you have upgraded {upgrade} to Level {pet_levels[upgrade]}")
                 wait = input()
                 shop()
@@ -148,7 +156,7 @@ def shop():
             time.sleep(tss)
             
         shop()
-    elif shop_packs == "rs":
+    elif shop_packs == "r":
         if money > shop_refresh_price - 1:
             money -= shop_refresh_price
             shop_refresh_price += 1
@@ -172,8 +180,9 @@ def shop():
 
 
 def main_menu():
+    
     global money
-    level_update()
+
     
     
 
@@ -211,43 +220,7 @@ def main_menu():
         print("")
         time.sleep(tss)
         main_menu()
-print("")
-print(f"56 Charakters werden geladen")
-time.sleep(2)
-r = 0.3
-for i in range(5):
-    llines = [
-        "Loading module: kernel32.dll",
-    "Initializing subsystem...",
-    "Connecting to localhost:8080",
-    "Starting deep scan...",
-    "Reading configuration: config.sys",
-    "Activating security protocols",
-    "Saving cache...",
-    "Analyzing data streams...",
-    "Encrypting temporary files...",
-    "Starting process: ghost_worker.exe",
-    "Installing debug patch",
-    "Starting self-diagnosis...",
-    "Connection to 127.0.0.1 successful",
-    "Syncing with server time",
-    "Checking dependencies...",
-    "Building project structure...",
-    "Initialization complete"
-    
-    ]
-    
-    
-    for line in llines:
-        print(line)
-        time.sleep(r)  
-        if r > 0.01:
-            r -= 0.01
-        else:
-            r = 0.01
-print("")
-print("Loading finished!")
-time.sleep(1)
+
 main_menu()
 
 

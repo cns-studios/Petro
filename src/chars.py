@@ -2,15 +2,15 @@
 level_multiplayer = 1
 
 
+starter_p = ["Worm"]
 
+common_p = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
 
-common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
+rare_p = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal"]
 
-rare_pets = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal"]
+legendary_p = ["Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon", "Python","Komodo Dragon", "Elephant"]
 
-legendary_pets = ["Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon", "Python","Komodo Dragon", "Elephant"]
-
-pet_levels = {
+p_levels = {
     "Worm": 1,
     "Ant": 1,
     "Rat": 1,
@@ -136,7 +136,7 @@ elephant_stats = {"attack": 30 * level_multiplayer, "hp": 150 * level_multiplaye
 
 
 
-all_pet_stats = {
+all_p_stats = {
     "Worm": worm_stats,
     "Ant": ant_stats,
     "Rat": rat_stats,
@@ -197,3 +197,14 @@ all_pet_stats = {
 
 
 
+def level_update():
+    for pet_name, stats in all_pet_stats.items():
+        level = pet_levels.get(pet_name, 1)
+        rarity = stats["rarity"]
+
+        # Erhöhungsfaktor je nach Rarität
+        scale = rarity if rarity > 0 else 1  # starter = 1
+
+        # Basiswerte anpassen
+        stats["attack"] += (level - 1) * scale
+        stats["hp"] += (level - 1) * scale
