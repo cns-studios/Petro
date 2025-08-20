@@ -9,7 +9,7 @@ shop_refresh_price = 5
 tss = 1.5                               # wartezeit zwischen nachricht und hauptmenu
 money = 50000
 stage = 1
-Inventory = ["Worm"]
+Inventory = ["Worm", "Raccoon", "Tiger", "Python", "Elephant","Rat"]
 
 def roll_packs(anzahl, chance):
     return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
@@ -52,10 +52,10 @@ def shop():
     for line in liness:
         print(line)
         time.sleep(0.03)
-    shop_packs = input("1, 2,3, 4, r or Main Menu?: ").lower()
-    if shop_packs == "m":
+    user_request = input("1, 2,3, 4, r or Main Menu?: ").lower()
+    if user_request == "m":
         main_menu()
-    elif shop_packs == "up":
+    elif user_request == "up":
         if upgrade_pack > 0:
             if money > 2:
                 money -= 3
@@ -79,34 +79,20 @@ def shop():
             
         shop()
 
-    elif shop_packs == "bp":
-        if buff_pack > 0:
-            if money > 3:
-                money -= 4
-                buff_pack -= 1
-                shop()
-            else:
-                print("not enough Money")
-                time.sleep(2)
-                shop()
-        else:
-            print("not on Stock")
-            time.sleep(tss)
-            
-        shop()
-    elif shop_packs == "cp":  
+    
+    elif user_request == "cp":  
         if charakter_pack > 0:
             if money > 7:
                 money -= 8
                 charakter_pack -= 1
                 c_r_l = random.randint(0,100)
-                if c_r_l > 94:
+                if c_r_l > 90:
                     r_p = random.choice(rare_pets)
                     Inventory.append(r_p)
                     rare_pets.remove(r_p)
                     print(f"You have got a rare {r_p}.")
                     wait = input("")
-                elif c_r_l < 11:
+                elif c_r_l < 5:
                     r_p = random.choice(legendary_pets)
                     Inventory.append(r_p)
                     legendary_pets.remove(r_p)
@@ -131,7 +117,7 @@ def shop():
             time.sleep(tss)
         shop()
         
-    elif shop_packs == "lup":
+    elif user_request == "lup":
         if legendary_upgrade_pack > 0:
             if money > 9:
                 money -= 10
@@ -154,9 +140,143 @@ def shop():
         else:
             print("not on Stock")
             time.sleep(tss)
+
+    elif user_request == "bp":
+        if buff_pack > 0:
+            if money > 3:
+                money -= 4
+                buff_pack -= 1
+                available_buffs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+                selected_buffs = random.sample(available_buffs, 3)
+                buff_descriptions = {
+                1: "+1 Attack for all Pets in Inventory",
+                2: "+1 HP for all Pets in Inventory", 
+                3: "+2% Dodge Chance for all Pets in Inventory",
+                4: "+2 Attack for all Common Pets in Inventory",
+                5: "+2 HP for all Common Pets in Inventory",
+                6: "+3 Attack for all rare Pets in Inventory",
+                7: "+3 hp for all rare Pets in Inventory",
+                8: "+5 Attack for all Legandary Pets in Inventory",
+                9: "+5 hp for all Legandary Pets in Inventory",
+                10: "1 money for every Pet in Inventory",
+                11: "+2 Money for every common and -1 for each rare in Inventory",
+                12: "dubble the money you have",
+                13: "+1 Level for all Pets in Inventory",
+
+
+            }
+            
+            print("-------------------------------")
+            print("Choose one of these buffs:")
+            print(f"1) {buff_descriptions[selected_buffs[0]]}")
+            print(f"2) {buff_descriptions[selected_buffs[1]]}")
+            print(f"3) {buff_descriptions[selected_buffs[2]]}")
+            
+            
+            while True:
+                choice = input("Enter 1, 2, or 3: ")
+                if choice in ["1", "2", "3"]:
+                    chosen_buff = selected_buffs[int(choice) - 1]
+                    break
+                else:
+                    print("Invalid choice! Enter 1, 2, or 3.")
+            
+            
+            if chosen_buff == 1:
+                print("You have chosen: +1 Attack for all Pets")
+                for pet in Inventory:
+                    all_pet_stats[pet]["attack"] += 1
+            elif chosen_buff == 2:
+                print("You have chosen: +1 HP for all Pets")
+                for pet in Inventory:
+                    all_pet_stats[pet]["hp"] += 1
+            elif chosen_buff == 3:
+                print("You have chosen: +5% Dodge Chance for all Pets")
+                for pet in Inventory:
+                    all_pet_stats[pet]["dodge_chance"] += 2
+            elif chosen_buff == 4:
+                print("You have chosen: +2 Attack for all Common Pets")
+                for pet in Inventory:
+                    if pet in common_pets:
+                        all_pet_stats[pet]["attack"] += 2
+            elif chosen_buff == 5:
+                print("You have chosen: +2 HP for all Common Pets")
+                for pet in Inventory:
+                    if pet in common_pets:
+                        all_pet_stats[pet]["hp"] += 2
+            elif chosen_buff == 6:
+                print("You have chosen: +3 Attack for all Rare Pets")
+                for pet in Inventory:
+                    if pet in rare_pets:
+                        all_pet_stats[pet]["attack"] += 3
+            elif chosen_buff == 7:
+                print("You have chosen: +3 HP for all Rare Pets")
+                for pet in Inventory:
+                    if pet in rare_pets:
+                        all_pet_stats[pet]["hp"] += 3
+            elif chosen_buff == 8:
+                print("You have chosen: +5 Attack for all Legendary Pets")
+                for pet in Inventory:
+                    if pet in legendary_pets:
+                        all_pet_stats[pet]["attack"] += 5
+            elif chosen_buff == 9:
+                print("You have chosen: +5 HP for all Legendary Pets")
+                for pet in Inventory:
+                    if pet in legendary_pets:
+                        all_pet_stats[pet]["hp"] += 5
+            elif chosen_buff == 10:
+                print("You have chosen: +1 Money for every Pet in Inventory")
+                money_1 = len(Inventory)
+                print(f"You have got {money_1} Money")
+                money += money_1
+            elif chosen_buff == 11:
+                print("You have chosen: +2 Money for every Common Pet and -1 for each Rare Pet in Inventory")
+                money_2 = sum(2 for pet in Inventory if pet in common_pets) - sum(1 for pet in Inventory if pet in rare_pets)
+                print(f"You have got {money_2} Money")  
+                money += money_2
+            elif chosen_buff == 12:
+                print("You have chosen: Dubble the Money you have (Max. 25)")
+                if money * 2 <= 25:
+                    money *= 2
+                    print(f"You have got {money/2} Money")
+                else:
+                    print("You have got 25 Money")
+                    money += 25
+            elif chosen_buff == 13:
+                print("You have chosen: +1 Level for all Pets in Inventory")
+                for pet in Inventory:
+                    if pet in pet_levels:
+                        pet_levels[pet] += 1
+                        all_pet_stats[pet]["attack"] += all_pet_stats[pet]["rarity"]
+                        all_pet_stats[pet]["hp"] += all_pet_stats[pet]["rarity"]
+            
+
+            
+                
+                time.sleep(1)
+                shop()
+      
+
+            
+            else:
+                    print("not enough Money")
+                    time.sleep(tss)
+                    shop()
+        else:
+            print("not on Stock")
+            time.sleep(tss)
+
+
+
+
+
+
+
+
+
             
         shop()
-    elif shop_packs == "r":
+    elif user_request == "r":
         if money > shop_refresh_price - 1:
             money -= shop_refresh_price
             shop_refresh_price += 1
@@ -173,7 +293,7 @@ def shop():
             print("not enough money")
             time.sleep(tss)
             shop()
-    elif shop_packs == "e":
+    elif user_request == "e":
         exit()
     else:
         shop()
