@@ -9,7 +9,7 @@ shop_refresh_price = 5
 tss = 1.5                               # wartezeit zwischen nachricht und hauptmenu
 money = 50000
 stage = 1
-Inventory = ["Worm", "Raccoon", "Tiger", "Python", "Elephant","Rat"]
+Inventory = ["Worm"]
 
 def roll_packs(anzahl, chance):
     return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
