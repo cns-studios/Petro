@@ -70,7 +70,7 @@ pet_levels = {
 
 
 
-# starter
+# starter (marked as common)
 worm_stats = {"attack": 1 * level_multiplayer, "hp": 10 * level_multiplayer, "rarity": 1, "dodge_chance": 5}
 
 # common

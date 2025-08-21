@@ -180,8 +180,8 @@ def shop():
                     break
                 else:
                     print("Invalid choice! Enter 1, 2, or 3.")
-            
-            
+            money_1 = 0
+            money_2 = 0 
             if chosen_buff == 1:
                 print("You have chosen: +1 Attack for all Pets")
                 for pet in Inventory:
@@ -231,7 +231,13 @@ def shop():
                 money += money_1
             elif chosen_buff == 11:
                 print("You have chosen: +2 Money for every Common Pet and -1 for each Rare Pet in Inventory")
-                money_2 = sum(2 for pet in Inventory if pet in common_pets) - sum(1 for pet in Inventory if pet in rare_pets)
+                for pet in Inventory:
+                    if all_pet_stats[pet]["rarity"] ==  1:  
+                        money_2 += 2    
+                    elif all_pet_stats[pet]["rarity"] == 2:  
+                        money_2 -= 1 
+                    else:
+                        money_2 += 0
                 print(f"You have got {money_2} Money")  
                 money += money_2
             elif chosen_buff == 12:
