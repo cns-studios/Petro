@@ -25,8 +25,8 @@ if not exist "Dockerfile" (
 
 
 
-echo Building Docker image with tag 'Petro-Host'...
-docker build -t Petro-Host .
+echo Building Docker image with tag 'petro-host'...
+docker build -t petro-host .
 
 if %errorlevel% neq 0 (
     echo.
@@ -43,7 +43,7 @@ docker rm %CONTAINER_NAME% >nul 2>nul
 
 echo Starting new container '%CONTAINER_NAME%'...
 
-docker run -d -p 8080:3000 --name %CONTAINER_NAME% Petro-Host
+docker run -d -p 8080:3000 --name %CONTAINER_NAME% petro-host
 
 
 endlocal
