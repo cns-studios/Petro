@@ -31,8 +31,13 @@ app.use((req, res, next) => {
 });
 
 wss.on('connection', (ws, req) => {
+    console.log(`[Server] New WebSocket connection.`);
     const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) { ws.close(); return; }
+    if (!cookieHeader) { 
+        console.log('[Server] No cookie header, closing connection.');
+        ws.close(); 
+        return; 
+    }
     const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
         const [key, value] = cookie.trim().split('=');
         acc[key] = value;
@@ -40,51 +45,68 @@ wss.on('connection', (ws, req) => {
     }, {});
 
     const sessionId = cookies.sessionId;
-    if (!sessionId) { ws.close(); return; }
+    if (!sessionId) { 
+        console.log('[Server] No session ID in cookie, closing connection.');
+        ws.close(); 
+        return; 
+    }
+    console.log(`[Server] Connection associated with Session ID: ${sessionId}`);
 
     let gameProcess = gameInstances.get(sessionId);
 
     if (!gameProcess || gameProcess.killed) {
+        console.log(`[Game] No existing game process for ${sessionId}. Spawning a new one.`);
         gameProcess = spawn('python', ['-u', 'game.py']);
         gameInstances.set(sessionId, gameProcess);
 
+        gameProcess.on('spawn', () => {
+            console.log(`[Game] Successfully spawned process for ${sessionId} with PID: ${gameProcess.pid}`);
+        });
+
         gameProcess.stderr.on('data', (data) => {
-            console.error(`Game Error (SID: ${sessionId}): ${data}`);
+            console.error(`[Game ERROR] (SID: ${sessionId}): ${data.toString()}`);
         });
 
         gameProcess.on('close', (code) => {
-            console.log(`Game process (SID: ${sessionId}) exited with code ${code}`);
+            console.log(`[Game] Process for ${sessionId} exited with code ${code}`);
             gameInstances.delete(sessionId);
-            ws.close();
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
         });
+    } else {
+        console.log(`[Game] Re-using existing game process for ${sessionId} with PID: ${gameProcess.pid}`);
     }
 
     gameProcess.stdout.on('data', (data) => {
         const output = data.toString();
+        console.log(`[Game -> Server] (SID: ${sessionId}): ${output.trim()}`);
         output.split('\n').filter(line => line.trim() !== '').forEach(line => {
             try {
                 const gameState = JSON.parse(line);
                 if (ws.readyState === WebSocket.OPEN) {
+                    console.log(`[Server -> Client] (SID: ${sessionId}) Sending game state.`);
                     ws.send(JSON.stringify(gameState));
                 }
             } catch (e) {
-                console.error('Error parsing game state JSON:', e, 'Received:', line);
+                console.error('[Server] Error parsing game state JSON:', e, 'Received:', line);
             }
         });
     });
 
     ws.on('message', (message) => {
         const command = message.toString();
+        console.log(`[Client -> Server] (SID: ${sessionId}) Received command: ${command}`);
         if (gameProcess && !gameProcess.killed) {
             gameProcess.stdin.write(command + '\n');
+        } else {
+            console.error(`[Server] No game process found for ${sessionId} to send command to.`);
         }
     });
 
     ws.on('close', () => {
-        // The python process is intentionally not killed when the websocket closes
-        // so the user can reconnect on page refresh.
-        // A timeout could be added here to kill inactive processes.
-    });
+        console.log(`[Server] WebSocket closed for ${sessionId}. The game process will be kept alive for reconnection.`);
+    })
 });
 
 const PORT = process.env.PORT || 3000;
