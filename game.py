@@ -64,7 +64,10 @@ class Game:
             for pet in self.inventory: all_pet_stats[pet]["hp"] += 1
         elif buff_id == 3:
             message += "+2% Dodge Chance for all Pets"
-            for pet in self.inventory: all_pet_stats[pet]["dodge_chance"] += 2
+            for pet in self.inventory:
+                if all_pet_stats[pet]["dodge_chance"] < 98:
+                    all_pet_stats[pet]["dodge_chance"] += 2
+                else: all_pet_stats[pet]["dodge_chance"] = 99
         elif buff_id == 13:
             message += "+1 Level for all Pets"
             for pet in self.inventory:

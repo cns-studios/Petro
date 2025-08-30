@@ -2,9 +2,9 @@
 level_multiplayer = 1
 
 
-starter_pets = ["Worm"]
 
-common_pets = ["Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
+
+common_pets = ["Worm","Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
 
 rare_pets = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal"]
 
@@ -80,7 +80,7 @@ pet_levels = {
 #7 = Digger
 
 # common
-worm_stats = {"attack": 1 * level_multiplayer, "hp": 10 * level_multiplayer, "rarity": 0, "dodge_chance": 5, "class": [7]}
+worm_stats = {"attack": 1 * level_multiplayer, "hp": 10 * level_multiplayer, "rarity": 1, "dodge_chance": 80, "class": [7]}
 ant_stats = {"attack": 2 * level_multiplayer, "hp": 15 * level_multiplayer, "rarity": 1, "dodge_chance": 10, "class": [7]}
 rat_stats = {"attack": 5 * level_multiplayer, "hp": 25 * level_multiplayer, "rarity": 1, "dodge_chance": 12, "class": [6]}
 snail_stats = {"attack": 1 * level_multiplayer, "hp": 35 * level_multiplayer, "rarity": 1, "dodge_chance": 2, "class": [1]}
