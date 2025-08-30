@@ -3,7 +3,7 @@ import random
 import sys
 import os
 import math
-from Charaters_Card_Game import *
+from assets.pets import *
 
 
 shop_refresh_price = 5
