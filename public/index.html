@@ -7,7 +7,45 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+    <div id="game-container">
+        <div id="header">
+            <h1>Petro</h1>
+            <div id="stats">
+                <span>Money: <span id="money">0</span>$</span>
+                <span>Stage: <span id="stage">1</span></span>
+            </div>
+        </div>
+
+        <div id="inventory-section" class="section">
+            <h2>Your Pets</h2>
+            <div id="inventory"></div>
+        </div>
+
+        <div id="shop-section" class="section">
+            <h2>Shop</h2>
+            <div id="shop-items">
+                <div class="shop-item">Upgrade Pack (3$): <span id="shop-up">0</span> <button onclick="buy('up')">Buy</button></div>
+                <div class="shop-item">Buff Pack (4$): <span id="shop-bp">0</span> <button onclick="buy('bp')">Buy</button></div>
+                <div class="shop-item">Charakter Pack (8$): <span id="shop-cp">0</span> <button onclick="buy('cp')">Buy</button></div>
+                <div class="shop-item">Legendary Upgrade Pack (10$): <span id="shop-lup">0</span> <button onclick="buy('lup')">Buy</button></div>
+            </div>
+            <button id="reroll-btn" onclick="rerollShop()">Reroll Shop (<span id="reroll-price">5</span>$)</button>
+        </div>
+
+        <div id="message-center" class="section">
+            <h2>Log</h2>
+            <p id="message"></p>
+        </div>
+
+        <div id="buff-selection" class="modal-overlay" style="display: none;">
+            <div class="modal">
+                <h3>Choose a Buff</h3>
+                <div id="buff-choices"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>
