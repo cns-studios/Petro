@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 function createGameProcess(sessionId) {
     console.log(`[Game] Spawning new game process for SID: ${sessionId}`);
-    const gameProcess = spawn('python', ['-u', 'game.py']);
+    const gameProcess = spawn('py', ['-u', 'game.py']);
     gameInstances.set(sessionId, gameProcess);
 
     gameProcess.on('spawn', () => {
