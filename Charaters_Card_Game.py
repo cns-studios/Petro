@@ -152,6 +152,7 @@ all_pet_stats = {
     "Bee": bee_stats,
     "Stag Beetle": stag_beetle_stats,
     "Grasshopper": grasshopper_stats,
+    "Cricket": cricket_stats,
     "Ladybug": ladybug_stats,
     "Butterfly": butterfly_stats,
     "Moth": moth_stats,

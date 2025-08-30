@@ -380,9 +380,9 @@ def main_menu():
 
 
 
-pet_1 = "Mosquito"
-pet_2 = "Moth"
-pet_1, pet_2 = random.sample(all_pets, 2)
+pet_1 = "Cricket"
+pet_2 = "Slug"
+#pet_1, pet_2 = random.sample(all_pets, 2)
 
 print(pet_1, ": Attack:", all_pet_stats[pet_1]["attack"], "HP:", all_pet_stats[pet_1]["hp"], "Class:", all_pet_stats[pet_1]["class"], "Dodge Chance:", all_pet_stats[pet_1]["dodge_chance"], "%")
 print(pet_2, ": Attack:", all_pet_stats[pet_2]["attack"], "HP:", all_pet_stats[pet_2]["hp"], "Class:", all_pet_stats[pet_2]["class"], "Dodge Chance:", all_pet_stats[pet_2]["dodge_chance"], "%")
