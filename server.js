@@ -41,48 +41,41 @@ app.get('/', (req, res) => {
 
     if (!sessionId) {
         sessionId = uuidv4();
-        console.log(`[Server] No session ID found. Creating new one: ${sessionId}`);
+        console.log(`[Server] No session ID in cookie. Creating new one: ${sessionId}`);
         res.cookie('sessionId', sessionId, { maxAge: 900000, httpOnly: true });
-        createGameProcess(sessionId);
-    } else {
-        console.log(`[Server] Found session ID: ${sessionId}`);
-        if (!gameInstances.has(sessionId)) {
-            console.log(`[Server] No game process found for existing session. Creating new one.`);
-            createGameProcess(sessionId);
-        }
     }
-    
+     
+    if (!gameInstances.has(sessionId)) {
+        console.log(`[Server] No game process found for session ${sessionId}. Creating one.`);
+        createGameProcess(sessionId);
+    }
+
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 wss.on('connection', (ws, req) => {
     console.log(`[Server] New WebSocket connection attempt.`);
+    let sessionId;
     const cookieHeader = req.headers.cookie;
-    if (!cookieHeader) {
-        console.log('[Server] WebSocket rejected: No cookie header.');
-        ws.close();
-        return;
+    if (cookieHeader) {
+        const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=');
+            acc[key] = value;
+            return acc;
+        }, {});
+        sessionId = cookies.sessionId;
     }
-
-    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
-        const [key, value] = cookie.trim().split('=');
-        acc[key] = value;
-        return acc;
-    }, {});
-    const sessionId = cookies.sessionId;
 
     if (!sessionId) {
-        console.log('[Server] WebSocket rejected: No session ID in cookie.');
-        ws.close();
-        return;
+        sessionId = uuidv4();
+        console.log(`[Server] No cookie on WS. Created temporary SID: ${sessionId}`);
     }
 
-    const gameProcess = gameInstances.get(sessionId);
+    let gameProcess = gameInstances.get(sessionId);
 
     if (!gameProcess || gameProcess.killed) {
-        console.log(`[Server] WebSocket rejected: No live game process for SID: ${sessionId}.`);
-        ws.close();
-        return;
+        console.log(`[Server] No live game process for SID: ${sessionId}. Creating new one.`);
+        gameProcess = createGameProcess(sessionId);
     }
 
     console.log(`[Server] WebSocket connected for SID: ${sessionId}`);
@@ -91,12 +84,8 @@ wss.on('connection', (ws, req) => {
         const output = data.toString();
         console.log(`[Game -> Server] (SID: ${sessionId}): ${output.trim()}`);
         output.split('\n').filter(line => line.trim() !== '').forEach(line => {
-            try {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(line); // Send the raw JSON string
-                }
-            } catch (e) {
-                console.error('[Server] Error sending game state:', e);
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(line);
             }
         });
     };
@@ -111,7 +100,6 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
         console.log(`[Server] WebSocket closed for SID: ${sessionId}.`);
-        // Remove the listener to prevent memory leaks
         gameProcess.stdout.removeListener('data', onData);
     });
 });
