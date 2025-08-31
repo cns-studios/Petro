@@ -52,6 +52,7 @@ function updateUI(state) {
             <div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
             <div>Dodge: ${pet.dodge_chance}%</div>
+            <div>Rarity: ${pet.rarity}</div>
         `;
         inventoryEl.appendChild(petCard);
     });
