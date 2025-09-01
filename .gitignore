@@ -2,3 +2,5 @@
 .env
 node_modules
 __pycache__
+pnpm-lock.yaml
+package-lock.json
