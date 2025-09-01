@@ -48,6 +48,7 @@ function updateUI(state) {
     state.inventory.forEach(pet => {
         const petCard = document.createElement('div');
         petCard.className = 'pet-card';
+        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
         petCard.innerHTML = `
             <div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>

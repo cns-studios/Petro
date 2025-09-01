@@ -59,18 +59,18 @@ body {
 }
 
 .pet-card.rarity-common {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+    background-color: #0ba222;
+    border-color: #008a20;
 }
 
 .pet-card.rarity-rare {
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+    background-color: #1c63b9;
+    border-color: #0e1a77;
 }
 
 .pet-card.rarity-legendary {
-    background-color: #fff3cd;
-    border-color: #ffeaa7;
+    background-color: #e7ca0d;
+    border-color: #b69014;
 }
 
 .pet-card .name {
