@@ -220,6 +220,58 @@ class Game:
             else: message = "Not enough money to reroll."
         
         return self.get_state(message)
+    def modify_two_pets(pets: dict, pet_1, pet_2):
+    
+    mod_pets = {
+        pet_1: pets[pet_1].copy(),
+        pet_2: pets[pet_2].copy()
+    }
+
+    def apply_rules(attacker, defender):
+        classes = mod_pets[attacker]["class"]
+        other_classes = mod_pets[defender]["class"]
+
+        def change_attack(pet, percent):
+            mod_pets[pet]["attack"] = round(mod_pets[pet]["attack"] * (1 + percent / 100))
+
+        def change_dodge(pet, percent):
+            mod_pets[pet]["dodge_chance"] = max(0, min(100, round(mod_pets[pet].get("dodge_chance", 0) * (1 + percent / 100))))
+
+        # Poisoner vs Tank -> Poisoner -30% Attack
+        if 2 in classes and 1 in other_classes:
+            change_attack(attacker, -30)
+
+        # Berserker vs Tank -> +20% Attack
+        if 4 in classes and 1 in other_classes:
+            change_attack(attacker, 20)
+
+        # Dodger vs Assassin -> -10% Dodge
+        if 6 in classes and 3 in other_classes:
+            change_dodge(attacker, -10)
+
+        # Aerial vs Digger -> Aerial +15% Attack
+        if 5 in classes and 7 in other_classes:
+            change_attack(attacker, 15)
+
+        # Digger vs Tank -> Digger +10% Attack
+        if 7 in classes and 1 in other_classes:
+            change_attack(attacker, 10)
+
+        # Assassin vs Tank -> -10% Attack
+        if 3 in classes and 1 in other_classes:
+            change_attack(attacker, -10)
+
+        # dodjer or aerials vs poisner -> -20% Dodje
+        if (5 in classes or 6 in classes) and 2 in other_classes:
+            change_dodge(attacker, -20)
+
+    # Regeln für beide Richtungen anwenden
+    apply_rules(pet_1, pet_2)
+    apply_rules(pet_2, pet_1)
+
+    return mod_pets
+
+    mod_pets = modify_two_pets(all_pet_stats, pet_1, pet_2)
 
 if __name__ == "__main__":
     game = Game()
