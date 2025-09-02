@@ -1,3 +1,109 @@
+const authContainer = document.getElementById('auth-container');
+const gameContainer = document.getElementById('game-container');
+
+const loginView = document.getElementById('login-view');
+const signupView = document.getElementById('signup-view');
+
+const showSignupBtn = document.getElementById('show-signup');
+const showLoginBtn = document.getElementById('show-login');
+
+const loginBtn = document.getElementById('login-btn');
+const signupBtn = document.getElementById('signup-btn');
+
+const loginUsernameEl = document.getElementById('login-username');
+const loginPinEl = document.getElementById('login-pin');
+
+const signupUsernameEl = document.getElementById('signup-username');
+const signupResultEl = document.getElementById('signup-result');
+
+const saveBtn = document.getElementById('save-btn');
+
+let ws;
+
+// --- Auth UI Logic ---
+showSignupBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginView.style.display = 'none';
+    signupView.style.display = 'block';
+});
+
+showLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signupView.style.display = 'none';
+    loginView.style.display = 'block';
+});
+
+signupBtn.addEventListener('click', async () => {
+    const username = signupUsernameEl.value;
+    if (!username) {
+        alert('Please enter a username.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+
+        const result = await response.json();
+        signupResultEl.style.display = 'block';
+
+        if (response.ok) {
+            signupResultEl.innerHTML = `Signup successful! Your PIN is: <strong>${result.pin}</strong>. Please save it and log in.`;
+            signupResultEl.style.color = 'green';
+        } else {
+            signupResultEl.textContent = result.message;
+            signupResultEl.style.color = 'red';
+        }
+    } catch (error) {
+        signupResultEl.style.display = 'block';
+        signupResultEl.textContent = 'An error occurred. Please try again.';
+        signupResultEl.style.color = 'red';
+        console.error('Signup error:', error);
+    }
+});
+
+loginBtn.addEventListener('click', async () => {
+    const username = loginUsernameEl.value;
+    const pin = loginPinEl.value;
+
+    if (!username || !pin) {
+        alert('Please enter both username and PIN.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, pin })
+        });
+
+        if (response.ok) {
+            console.log('Login successful');
+            authContainer.style.display = 'none';
+            gameContainer.style.display = 'block';
+            connectWebSocket(username, pin);
+        } else {
+            const result = await response.json();
+            alert(`Login failed: ${result.message}`);
+        }
+    } catch (error) {
+        alert('An error occurred during login. Please try again.');
+        console.error('Login error:', error);
+    }
+});
+
+saveBtn.addEventListener('click', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('save');
+    }
+});
+
+// --- Game and WebSocket Logic ---
+
 const moneyEl = document.getElementById('money');
 const stageEl = document.getElementById('stage');
 const inventoryEl = document.getElementById('inventory');
@@ -12,8 +118,6 @@ const rerollPriceEl = document.getElementById('reroll-price');
 const buffSelectionModal = document.getElementById('buff-selection');
 const buffChoicesEl = document.getElementById('buff-choices');
 
-const ws = new WebSocket(`ws://${window.location.host}`);
-
 const BUFF_DESCRIPTIONS = {
     1: "+1 Attack for all Pets",
     2: "+1 HP for all Pets",
@@ -21,51 +125,72 @@ const BUFF_DESCRIPTIONS = {
     13: "+1 Level for all Pets",
 };
 
-ws.onopen = () => {
-    console.log('Connected to the server.');
-};
+function connectWebSocket(username, pin) {
+    ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
 
-ws.onmessage = (event) => {
-    const gameState = JSON.parse(event.data);
-    updateUI(gameState);
-};
+    ws.onopen = () => {
+        console.log('Connected to the server.');
+        messageEl.textContent = 'Connected! Welcome back.';
+    };
 
-ws.onclose = () => {
-    console.log('Disconnected from the server.');
-    messageEl.textContent = 'Connection lost. Please refresh the page.';
-};
+    ws.onmessage = (event) => {
+        const gameState = JSON.parse(event.data);
+        updateUI(gameState);
+    };
+
+    ws.onclose = (event) => {
+        console.log('Disconnected from the server.', event.reason);
+        messageEl.textContent = `Connection lost: ${event.reason || 'Please refresh'}`;
+        gameContainer.style.display = 'none';
+        authContainer.style.display = 'block';
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        messageEl.textContent = 'A connection error occurred.';
+    };
+}
 
 function updateUI(state) {
-    moneyEl.textContent = state.money;
-    stageEl.textContent = state.stage;
+    if (state.money !== undefined) moneyEl.textContent = state.money;
+    if (state.stage !== undefined) stageEl.textContent = state.stage;
     
     if (state.message) {
         messageEl.textContent = state.message;
+        // Clear the message after a few seconds if it's a status update
+        if (state.message !== 'Choose a buff.') {
+            setTimeout(() => {
+                if (messageEl.textContent === state.message) {
+                    messageEl.textContent = '';
+                }
+            }, 4000);
+        }
     }
 
-    // Update Inventory
-    inventoryEl.innerHTML = '';
-    state.inventory.forEach(pet => {
-        const petCard = document.createElement('div');
-        petCard.className = 'pet-card';
-        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
-        petCard.innerHTML = `
-            <div class="name">${pet.name} (Lv. ${pet.level})</div>
-            <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
-            <div>Dodge: ${pet.dodge_chance}%</div>
-            <div>Rarity: ${pet.rarity}</div>
-        `;
-        inventoryEl.appendChild(petCard);
-    });
+    if (state.inventory) {
+        inventoryEl.innerHTML = '';
+        state.inventory.forEach(pet => {
+            const petCard = document.createElement('div');
+            petCard.className = 'pet-card';
+            petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
+            petCard.innerHTML = `
+                <div class="name">${pet.name} (Lv. ${pet.level})</div>
+                <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
+                <div>Dodge: ${pet.dodge_chance}%</div>
+                <div>Rarity: ${pet.rarity}</div>
+            `;
+            inventoryEl.appendChild(petCard);
+        });
+    }
 
-    // Update Shop
-    shopUpEl.textContent = state.shop.upgrade_pack;
-    shopBpEl.textContent = state.shop.buff_pack;
-    shopCpEl.textContent = state.shop.charakter_pack;
-    shopLupEl.textContent = state.shop.legendary_upgrade_pack;
-    rerollPriceEl.textContent = state.shop.shop_refresh_price;
+    if (state.shop) {
+        shopUpEl.textContent = state.shop.upgrade_pack;
+        shopBpEl.textContent = state.shop.buff_pack;
+        shopCpEl.textContent = state.shop.charakter_pack;
+        shopLupEl.textContent = state.shop.legendary_upgrade_pack;
+        rerollPriceEl.textContent = state.shop.shop_refresh_price;
+    }
 
-    // Handle Buff Choices
     if (state.pending_buff_choices && state.pending_buff_choices.length > 0) {
         buffChoicesEl.innerHTML = '';
         state.pending_buff_choices.forEach((buffId, index) => {
@@ -82,14 +207,20 @@ function updateUI(state) {
 }
 
 function buy(item) {
-    ws.send(`shop_buy ${item}`);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(`shop_buy ${item}`);
+    }
 }
 
 function rerollShop() {
-    ws.send('shop_reroll');
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('shop_reroll');
+    }
 }
 
 function selectBuff(index) {
-    ws.send(`select_buff ${index}`);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(`select_buff ${index}`);
+    }
     buffSelectionModal.style.display = 'none';
 }

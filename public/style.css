@@ -139,3 +139,39 @@ button:hover {
 .buff-choice:hover {
     background-color: #f0f0f0;
 }
+
+#login-btn {
+    width: 100px;
+    margin-top: 10px;
+    border-radius: 15px;
+}
+
+#login-username {
+    border-radius: 100px;
+    height: 30px;
+    width: 200px;
+    border-width: 1px;
+    padding-left: 10px;
+}
+
+#login-pin {
+    border-radius: 100px;
+    height: 30px;
+    width: 200px;
+    border-width: 1px;
+    padding-left: 10px;
+}
+
+#signup-username {
+    border-radius: 100px;
+    height: 30px;
+    width: 200px;
+    border-width: 1px;
+    padding-left: 10px;
+}
+
+#signup-btn {
+    width: 100px;
+    margin-top: 10px;
+    border-radius: 15px;
+}
