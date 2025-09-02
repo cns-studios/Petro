@@ -1,7 +1,7 @@
 import sys
 import json
 import random
-from assets.pets import all_pet_stats, common_pets, rare_pets, legendary_pets, pet_levels
+from assets.pets import all_pet_stats, common_pets, rare_pets, legendary_pets, pet_levels, all_pets
 
 class Game:
     def __init__(self):
@@ -221,10 +221,11 @@ class Game:
         
         return self.get_state(message)
     def modify_two_pets(pets: dict, pet_1, pet_2):
-    
-    mod_pets = {
-        pet_1: pets[pet_1].copy(),
-        pet_2: pets[pet_2].copy()
+        global mod_pets, pet_1, pet_2
+        pet_1, pet_2 = random.sample(all_pets, 2)
+        mod_pets = {
+            pet_1: pets[pet_1].copy(),
+            pet_2: pets[pet_2].copy()
     }
 
     def apply_rules(attacker, defender):
