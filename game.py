@@ -1,7 +1,7 @@
 import sys
 import json
 import random
-from assets.pets import all_pet_stats, common_pets, rare_pets, legendary_pets, pet_levels
+from assets.pets import all_pet_stats, common_pets, rare_pets, legendary_pets, pet_levels, all_pets
 
 class Game:
     def __init__(self):
@@ -68,6 +68,60 @@ class Game:
                 if all_pet_stats[pet]["dodge_chance"] < 98:
                     all_pet_stats[pet]["dodge_chance"] += 2
                 else: all_pet_stats[pet]["dodge_chance"] = 99
+        elif buff_id == 4:
+            message += "+2 Attack for all Common Pets"
+            for pet in self.inventory:
+                if pet in common_pets:
+                    all_pet_stats[pet]["attack"] += 2
+        elif buff_id == 5:
+            message += " +2 HP for all Common Pets"
+            for pet in self.inventory:
+                if pet in common_pets:
+                    all_pet_stats[pet]["hp"] += 2
+        elif buff_id == 6:
+            message += " +3 Attack for all Rare Pets"
+            for pet in self.inventory:
+                if pet in rare_pets:
+                    all_pet_stats[pet]["attack"] += 3
+        elif buff_id == 7:
+            message += " +3 HP for all Rare Pets"
+            for pet in self.inventory:
+                if pet in rare_pets:
+                    all_pet_stats[pet]["hp"] += 3
+        elif buff_id == 8:
+            message += " +5 Attack for all Legendary Pets"
+            for pet in self.inventory:
+                if pet in legendary_pets:
+                    all_pet_stats[pet]["attack"] += 5
+        elif buff_id == 9:
+            message += " +5 HP for all Legendary Pets"
+            for pet in self.inventory:
+                if pet in legendary_pets:
+                    all_pet_stats[pet]["hp"] += 5
+        elif buff_id == 10:
+            message += " +1 Money for every Pet in Inventory"
+            money_1 = len(self.inventory)
+            message += f"You have got {money_1} Money"
+            money += money_1
+        elif buff_id == 11:
+            message += " +2 Money for every Common Pet and -1 for each Rare Pet in Inventory"
+            for pet in self.inventory:
+                if all_pet_stats[pet]["rarity"] ==  1:  
+                    money_2 += 2    
+                elif all_pet_stats[pet]["rarity"] == 2:  
+                    money_2 -= 1 
+                else:
+                    money_2 += 0
+            message += f"You have got {money_2} Money"
+            money += money_2
+        elif buff_id == 12:
+            message += " Dubble the Money you have (Max. 25)"
+            if money * 2 <= 25:
+                money *= 2
+                money += f"You have got {money/2} Money"
+            else:
+                money += "You have got 25 Money"
+                money += 25
         elif buff_id == 13:
             message += "+1 Level for all Pets"
             for pet in self.inventory:
@@ -131,11 +185,16 @@ class Game:
                 if self.buff_pack > 0 and self.money >= 4:
                     self.money -= 4
                     self.buff_pack -= 1
-                    available_buffs = [1, 2, 3, 13]
+                    available_buffs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
                     self.pending_buff_choices = random.sample(available_buffs, 3)
                     buff_descriptions = {
                         1: "+1 Attack for all Pets", 2: "+1 HP for all Pets",
-                        3: "+2% Dodge Chance for all Pets", 13: "+1 Level for all Pets"
+                        3: "+2% Dodge Chance for all Pets",4: "+2 Attack for all Common Pets"", 13: +1 Level for all Pets",
+                        5: "+2 HP for all Common Pets", 6: "+3 Attack for all Rare Pets",
+                        7: "+3 HP for all Rare Pets", 8: "+5 Attack for all Legendary Pets",
+                        9: "+5 HP for all Legendary Pets", 10: "+1 Money for every Pet in Inventory",
+                        11: "+2 Money for every Common Pet and -1 for each Rare Pet in Inventory", 12: "Dubble the Money you have (Max. 25)",
+                        13: "+1 Level for all Pets"
                     }
                     message = "Choose a buff."
                     # The state returned will contain the choices for the frontend
@@ -161,6 +220,59 @@ class Game:
             else: message = "Not enough money to reroll."
         
         return self.get_state(message)
+    def modify_two_pets(pets: dict, pet_1, pet_2):
+        global mod_pets, pet_1, pet_2
+        pet_1, pet_2 = random.sample(all_pets, 2)
+        mod_pets = {
+            pet_1: pets[pet_1].copy(),
+            pet_2: pets[pet_2].copy()
+    }
+
+    def apply_rules(attacker, defender):
+        classes = mod_pets[attacker]["class"]
+        other_classes = mod_pets[defender]["class"]
+
+        def change_attack(pet, percent):
+            mod_pets[pet]["attack"] = round(mod_pets[pet]["attack"] * (1 + percent / 100))
+
+        def change_dodge(pet, percent):
+            mod_pets[pet]["dodge_chance"] = max(0, min(100, round(mod_pets[pet].get("dodge_chance", 0) * (1 + percent / 100))))
+
+        # Poisoner vs Tank -> Poisoner -30% Attack
+        if 2 in classes and 1 in other_classes:
+            change_attack(attacker, -30)
+
+        # Berserker vs Tank -> +20% Attack
+        if 4 in classes and 1 in other_classes:
+            change_attack(attacker, 20)
+
+        # Dodger vs Assassin -> -10% Dodge
+        if 6 in classes and 3 in other_classes:
+            change_dodge(attacker, -10)
+
+        # Aerial vs Digger -> Aerial +15% Attack
+        if 5 in classes and 7 in other_classes:
+            change_attack(attacker, 15)
+
+        # Digger vs Tank -> Digger +10% Attack
+        if 7 in classes and 1 in other_classes:
+            change_attack(attacker, 10)
+
+        # Assassin vs Tank -> -10% Attack
+        if 3 in classes and 1 in other_classes:
+            change_attack(attacker, -10)
+
+        # dodjer or aerials vs poisner -> -20% Dodje
+        if (5 in classes or 6 in classes) and 2 in other_classes:
+            change_dodge(attacker, -20)
+
+    # Regeln für beide Richtungen anwenden
+    apply_rules(pet_1, pet_2)
+    apply_rules(pet_2, pet_1)
+
+    return mod_pets
+
+    mod_pets = modify_two_pets(all_pet_stats, pet_1, pet_2)
 
 if __name__ == "__main__":
     game = Game()
