@@ -192,7 +192,7 @@ def shop():
                 for pet in Inventory:
                     all_pet_stats[pet]["hp"] += 1
             elif chosen_buff == 3:
-                print("You have chosen: +5% Dodge Chance for all Pets")
+                print("You have chosen: +2% Dodge Chance for all Pets")
                 for pet in Inventory:
                     all_pet_stats[pet]["dodge_chance"] += 2
             elif chosen_buff == 4:
