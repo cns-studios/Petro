@@ -11,7 +11,7 @@ tss = 1.5                               # wartezeit zwischen nachricht und haupt
 money = 50000
 stage = 1
 Inventory = ["Worm"]
-
+s_rarity = 1
 def roll_packs(anzahl, chance):
     return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
 
@@ -43,11 +43,19 @@ def Inventory_function():
             confirm = input(f"Are you sure you want to sell {pet_to_sell} for {sell_price}$? (Y/N): ").lower()
             if confirm == 'y':
                 Inventory.remove(pet_to_sell)
-                all_pet_stats[pet_to_sell][rarity]
+                s_rarity = all_pet_stats[pet_to_sell]["rarity"]
                 money += sell_price
+                if s_rarity == 3:
+                    legendary_pets.append(pet_to_sell)
+                elif s_rarity == 2:
+                    rare_pets.append(pet_to_sell)
+                else:
+                    common_pets.append(pet_to_sell)
                 if pet_to_sell in pet_levels:
                     pet_levels[pet_to_sell] = 1
                 print(f"You have sold {pet_to_sell} for {sell_price}$.")
+            else:
+                print("Sale cancelled.")
         main_menu()
     
 def shop():
