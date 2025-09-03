@@ -10,43 +10,110 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'db', 'users.db') if os.path.d
 
 def push_state(username, game):
     if not username:
-        return
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    game_state_json = json.dumps(game.get_state(message=""))
-    cursor.execute("UPDATE users SET game_state = ? WHERE username = ?", (game_state_json, username))
-    conn.commit()
-    conn.close()
+        return False
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Create a complete game state including all necessary data
+        game_state = {
+            'money': game.money,
+            'stage': game.stage,
+            'inventory': [],
+            'shop': {
+                'upgrade_pack': game.upgrade_pack,
+                'buff_pack': game.buff_pack,
+                'charakter_pack': game.charakter_pack,
+                'legendary_upgrade_pack': game.legendary_upgrade_pack,
+                'shop_refresh_price': game.shop_refresh_price,
+            },
+            'pending_buff_choices': game.pending_buff_choices,
+            'available_pets': {
+                'common': game.available_common_pets,
+                'rare': game.available_rare_pets,
+                'legendary': game.available_legendary_pets
+            }
+        }
+        
+        # Save complete pet information
+        for pet_name in game.inventory:
+            if pet_name in game.all_pet_stats:
+                pet_data = {
+                    'name': pet_name,
+                    'level': game.pet_levels.get(pet_name, 1),
+                    'attack': game.all_pet_stats[pet_name]['attack'],
+                    'hp': game.all_pet_stats[pet_name]['hp'],
+                    'dodge_chance': game.all_pet_stats[pet_name]['dodge_chance'],
+                    'rarity': game.all_pet_stats[pet_name]['rarity']
+                }
+                game_state['inventory'].append(pet_data)
+        
+        # Save all modified pet stats (not just inventory)
+        modified_stats = {}
+        for pet_name, stats in game.all_pet_stats.items():
+            if pet_name in global_pet_stats:
+                # Check if stats differ from global defaults
+                if (stats['attack'] != global_pet_stats[pet_name]['attack'] or
+                    stats['hp'] != global_pet_stats[pet_name]['hp'] or
+                    stats['dodge_chance'] != global_pet_stats[pet_name]['dodge_chance']):
+                    modified_stats[pet_name] = {
+                        'attack': stats['attack'],
+                        'hp': stats['hp'],
+                        'dodge_chance': stats['dodge_chance']
+                    }
+        game_state['modified_stats'] = modified_stats
+        
+        # Save all pet levels
+        game_state['pet_levels'] = game.pet_levels
+        
+        game_state_json = json.dumps(game_state)
+        cursor.execute("UPDATE users SET game_state = ? WHERE username = ?", (game_state_json, username))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error saving game state: {e}", file=sys.stderr)
+        return False
 
 def pull_state(username):
     if not username:
         return None
     if not os.path.exists(DB_PATH):
         return None
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT game_state FROM users WHERE username = ?", (username,))
-    row = cursor.fetchone()
-    conn.close()
-    if row and row[0]:
-        return json.loads(row[0])
-    return None
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT game_state FROM users WHERE username = ?", (username,))
+        row = cursor.fetchone()
+        conn.close()
+        if row and row[0]:
+            return json.loads(row[0])
+        return None
+    except Exception as e:
+        print(f"Error loading game state: {e}", file=sys.stderr)
+        return None
 
 class Game:
     def __init__(self, username):
         self.username = username
+        
         # Create instance-specific copies of global data
         self.all_pet_stats = copy.deepcopy(global_pet_stats)
-        self.pet_levels = copy.deepcopy(global_pet_levels)
+        self.pet_levels = {}
         self.available_common_pets = global_common_pets.copy()
         self.available_rare_pets = global_rare_pets.copy()
         self.available_legendary_pets = global_legendary_pets.copy()
         
+        # Try to load saved state
         state = pull_state(username)
+        
         if state:
+            # Load basic game data
             self.money = state.get('money', 50000)
             self.stage = state.get('stage', 1)
-            self.inventory = [pet['name'] for pet in state.get('inventory', [])]
+            self.inventory = []
+            
+            # Load shop data
             shop_state = state.get('shop', {})
             self.shop_refresh_price = shop_state.get('shop_refresh_price', 5)
             self.upgrade_pack = shop_state.get('upgrade_pack', 0)
@@ -54,25 +121,55 @@ class Game:
             self.charakter_pack = shop_state.get('charakter_pack', 0)
             self.buff_pack = shop_state.get('buff_pack', 0)
             self.pending_buff_choices = state.get('pending_buff_choices', [])
-
-            # Restore pet stats and levels from saved state
+            
+            # Load available pets
+            available_pets = state.get('available_pets', {})
+            if available_pets:
+                self.available_common_pets = available_pets.get('common', global_common_pets.copy())
+                self.available_rare_pets = available_pets.get('rare', global_rare_pets.copy())
+                self.available_legendary_pets = available_pets.get('legendary', global_legendary_pets.copy())
+            
+            # Load pet levels
+            self.pet_levels = state.get('pet_levels', {})
+            
+            # Load modified pet stats
+            modified_stats = state.get('modified_stats', {})
+            for pet_name, stats in modified_stats.items():
+                if pet_name in self.all_pet_stats:
+                    self.all_pet_stats[pet_name]['attack'] = stats['attack']
+                    self.all_pet_stats[pet_name]['hp'] = stats['hp']
+                    self.all_pet_stats[pet_name]['dodge_chance'] = stats['dodge_chance']
+            
+            # Load inventory and restore pet-specific stats
             for pet_details in state.get('inventory', []):
                 pet_name = pet_details.get('name')
-                if pet_name:
-                    self.pet_levels[pet_name] = pet_details.get('level', 1)
-                    if pet_name in self.all_pet_stats:
-                        self.all_pet_stats[pet_name]['attack'] = pet_details.get('attack', self.all_pet_stats[pet_name].get('attack'))
-                        self.all_pet_stats[pet_name]['hp'] = pet_details.get('hp', self.all_pet_stats[pet_name].get('hp'))
-                        self.all_pet_stats[pet_name]['dodge_chance'] = pet_details.get('dodge_chance', self.all_pet_stats[pet_name].get('dodge_chance'))
+                if pet_name and pet_name in self.all_pet_stats:
+                    self.inventory.append(pet_name)
+                    # Restore pet-specific stats
+                    self.all_pet_stats[pet_name]['attack'] = pet_details.get('attack', self.all_pet_stats[pet_name]['attack'])
+                    self.all_pet_stats[pet_name]['hp'] = pet_details.get('hp', self.all_pet_stats[pet_name]['hp'])
+                    self.all_pet_stats[pet_name]['dodge_chance'] = pet_details.get('dodge_chance', self.all_pet_stats[pet_name]['dodge_chance'])
                     
-                    # Remove already owned pets from available lists
-                    if pet_name in self.available_common_pets:
-                        self.available_common_pets.remove(pet_name)
-                    elif pet_name in self.available_rare_pets:
-                        self.available_rare_pets.remove(pet_name)
-                    elif pet_name in self.available_legendary_pets:
-                        self.available_legendary_pets.remove(pet_name)
+                    # If pet levels weren't saved separately, get from inventory
+                    if pet_name not in self.pet_levels:
+                        self.pet_levels[pet_name] = pet_details.get('level', 1)
+            
+            # If available_pets wasn't saved (old save format), reconstruct it
+            if not available_pets:
+                for pet in self.inventory:
+                    if pet in self.available_common_pets:
+                        self.available_common_pets.remove(pet)
+                    elif pet in self.available_rare_pets:
+                        self.available_rare_pets.remove(pet)
+                    elif pet in self.available_legendary_pets:
+                        self.available_legendary_pets.remove(pet)
+            
+            # Reroll shop if no packs available
+            if (self.upgrade_pack == 0 and self.legendary_upgrade_pack == 0 and 
+                self.charakter_pack == 0 and self.buff_pack == 0):
+                self.reroll_shop()
         else:
+            # New game initialization
             self.money = 50000
             self.stage = 1
             self.inventory = ["Worm"]
@@ -82,12 +179,15 @@ class Game:
             self.charakter_pack = 0
             self.buff_pack = 0
             self.pending_buff_choices = []
-            # Initialize Worm's level
+            
+            # Initialize Worm
             self.pet_levels["Worm"] = 1
-            # Remove Worm from available pets
             if "Worm" in self.available_common_pets:
                 self.available_common_pets.remove("Worm")
+            
             self.reroll_shop()
+            # Save initial state
+            push_state(self.username, self)
 
     def roll_packs(self, anzahl, chance):
         return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
@@ -138,16 +238,16 @@ class Game:
             for pet in self.inventory: 
                 self.all_pet_stats[pet]["hp"] += 1
         elif buff_id == 3:
-            message = "+2% Dodge Chance for all Pets"
+            message += "+2% Dodge Chance for all Pets"
             for pet in self.inventory:
                 if self.all_pet_stats[pet]["dodge_chance"] < 98:
                     self.all_pet_stats[pet]["dodge_chance"] += 2
                 else: 
                     self.all_pet_stats[pet]["dodge_chance"] = 99
         elif buff_id == 4:
-            message = "+2 Attack for all Common Pets"
+            message += "+2 Attack for all Common Pets"
             for pet in self.inventory:
-                if self.all_pet_stats[pet]["rarity"] == 1:  # Common pets have rarity 1
+                if self.all_pet_stats[pet]["rarity"] == 1:
                     self.all_pet_stats[pet]["attack"] += 2
         elif buff_id == 5:
             message += "+2 HP for all Common Pets"
@@ -157,7 +257,7 @@ class Game:
         elif buff_id == 6:
             message += "+3 Attack for all Rare Pets"
             for pet in self.inventory:
-                if self.all_pet_stats[pet]["rarity"] == 2:  # Rare pets have rarity 2
+                if self.all_pet_stats[pet]["rarity"] == 2:
                     self.all_pet_stats[pet]["attack"] += 3
         elif buff_id == 7:
             message += "+3 HP for all Rare Pets"
@@ -167,7 +267,7 @@ class Game:
         elif buff_id == 8:
             message += "+5 Attack for all Legendary Pets"
             for pet in self.inventory:
-                if self.all_pet_stats[pet]["rarity"] == 3:  # Legendary pets have rarity 3
+                if self.all_pet_stats[pet]["rarity"] == 3:
                     self.all_pet_stats[pet]["attack"] += 5
         elif buff_id == 9:
             message += "+5 HP for all Legendary Pets"
@@ -188,19 +288,19 @@ class Game:
                 elif self.all_pet_stats[pet]["rarity"] == 2:  
                     money_2 -= 1 
             message += f". You have got {money_2} Money"
-            self.money = max(0, self.money + money_2)  # Prevent negative money
+            self.money = max(0, self.money + money_2)
         elif buff_id == 12:
             message += "Double the Money you have (Max. 25)"
             money_to_add = min(self.money, 25)
             self.money += money_to_add
             message += f". You have got {money_to_add} Money"
         elif buff_id == 13:
-            message = "+1 Level for all Pets"
+            message += "+1 Level for all Pets"
             for pet in self.inventory:
-                if pet in self.pet_levels:
-                    self.pet_levels[pet] += 1
-                    self.all_pet_stats[pet]["attack"] += self.all_pet_stats[pet]["rarity"]
-                    self.all_pet_stats[pet]["hp"] += self.all_pet_stats[pet]["rarity"]
+                self.pet_levels[pet] = self.pet_levels.get(pet, 1) + 1
+                self.all_pet_stats[pet]["attack"] += self.all_pet_stats[pet]["rarity"]
+                self.all_pet_stats[pet]["hp"] += self.all_pet_stats[pet]["rarity"]
+        
         self.pending_buff_choices = []
         return message
 
@@ -210,7 +310,10 @@ class Game:
         message = ""
 
         if action == "save":
-            message = "Game saved."
+            if push_state(self.username, self):
+                message = "Game saved successfully."
+            else:
+                message = "Failed to save game."
         elif action == "shop_buy":
             if len(parts) < 2:
                 return self.get_state("Invalid command.")
@@ -305,7 +408,10 @@ class Game:
             else: 
                 message = "Not enough money to reroll."
         
-        push_state(self.username, self)
+        # Auto-save after each command (except for save command itself)
+        if action != "save":
+            push_state(self.username, self)
+        
         return self.get_state(message)
 
 
@@ -321,14 +427,25 @@ if __name__ == "__main__":
         print(json.dumps({"message": "Error: Invalid username format."}))
         sys.exit(1)
 
-    game = Game(username)
-    print(json.dumps(game.get_state("Welcome to Petro!")))
-    sys.stdout.flush()
+    try:
+        game = Game(username)
+        print(json.dumps(game.get_state("Welcome to Petro!")))
+        sys.stdout.flush()
 
-    for line in sys.stdin:
-        command = line.strip()
-        if command == "exit":
-            break
-        state = game.process_command(command)
-        print(json.dumps(state))
+        for line in sys.stdin:
+            command = line.strip()
+            if command == "exit":
+                # Save before exiting
+                push_state(username, game)
+                break
+            try:
+                state = game.process_command(command)
+                print(json.dumps(state))
+                sys.stdout.flush()
+            except Exception as e:
+                error_state = game.get_state(f"Error processing command: {str(e)}")
+                print(json.dumps(error_state))
+                sys.stdout.flush()
+    except Exception as e:
+        print(json.dumps({"message": f"Fatal error: {str(e)}"}))
         sys.stdout.flush()
