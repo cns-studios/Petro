@@ -6,7 +6,6 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 
-
 const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +30,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 function createGameProcess(username) {
-    // Check if we're already creating a process for this user
     if (connectionAttempts.has(username)) {
         console.log(`[Game] Process creation already in progress for ${username}`);
         return connectionAttempts.get(username);
@@ -39,7 +37,6 @@ function createGameProcess(username) {
 
     console.log(`[Game] Spawning new game process for user: ${username}`);
     
-    // Determine the correct Python command based on OS
     const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
     const gameProcess = spawn(pythonCmd, ['-u', 'game.py', username]);
     

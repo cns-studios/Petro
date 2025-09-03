@@ -22,7 +22,6 @@ let ws;
 let currentUsername = null;
 let currentPin = null;
 
-// --- Cookie Management ---
 function setCookie(name, value, days) {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -44,13 +43,11 @@ function deleteCookie(name) {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
 
-// --- Check for saved credentials on page load ---
 window.addEventListener('DOMContentLoaded', async () => {
     const savedUsername = getCookie('username');
     const savedPin = getCookie('pin');
     
     if (savedUsername && savedPin) {
-        // Try to auto-login with saved credentials
         try {
             const response = await fetch('/login', {
                 method: 'POST',
@@ -66,7 +63,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 gameContainer.style.display = 'block';
                 connectWebSocket(savedUsername, savedPin);
             } else {
-                // Invalid saved credentials, clear them
                 deleteCookie('username');
                 deleteCookie('pin');
                 console.log('Auto-login failed, invalid saved credentials');
@@ -79,7 +75,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// --- Add logout button handler ---
 function logout() {
     deleteCookie('username');
     deleteCookie('pin');
@@ -94,7 +89,6 @@ function logout() {
     loginPinEl.value = '';
 }
 
-// --- Auth UI Logic ---
 showSignupBtn.addEventListener('click', (e) => {
     e.preventDefault();
     loginView.style.display = 'none';
@@ -160,7 +154,6 @@ loginBtn.addEventListener('click', async () => {
             currentUsername = username;
             currentPin = pin;
             
-            // Save credentials in cookies (expires in 7 days)
             setCookie('username', username, 7);
             setCookie('pin', pin, 7);
             
@@ -182,8 +175,6 @@ saveBtn.addEventListener('click', () => {
         ws.send('save');
     }
 });
-
-// --- Game and WebSocket Logic ---
 
 const moneyEl = document.getElementById('money');
 const stageEl = document.getElementById('stage');
@@ -224,7 +215,6 @@ function connectWebSocket(username, pin) {
         console.log('Connected to the server.');
         messageEl.textContent = 'Connected! Loading game state...';
         
-        // Request initial state after a short delay to ensure game process is ready
         stateRequestTimeout = setTimeout(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 console.log('Requesting initial game state...');
@@ -242,14 +232,11 @@ function connectWebSocket(username, pin) {
         console.log('Disconnected from the server.', event.reason);
         messageEl.textContent = `Connection lost: ${event.reason || 'Please refresh'}`;
         
-        // Clear any pending state request
         if (stateRequestTimeout) {
             clearTimeout(stateRequestTimeout);
             stateRequestTimeout = null;
         }
         
-        // Don't automatically show auth container if we have saved credentials
-        // This allows for reconnection attempts
         if (!getCookie('username') || !getCookie('pin')) {
             gameContainer.style.display = 'none';
             authContainer.style.display = 'block';
@@ -268,7 +255,6 @@ function updateUI(state) {
     
     if (state.message) {
         messageEl.textContent = state.message;
-        // Clear the message after a few seconds if it's a status update
         if (state.message !== 'Choose a buff.' && !state.message.includes('Welcome')) {
             setTimeout(() => {
                 if (messageEl.textContent === state.message) {
