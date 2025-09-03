@@ -31,11 +31,23 @@ def Fight():
 def Inventory_function():
     print("Your Inventory:")
     print(", ".join([f"{pet} (Lv.{pet_levels.get(pet, 1)})" for pet in Inventory]))
+    print("do You want to sell any Pet? Type: Sell Petname ")
     user_Request = input()
     if user_Request in Inventory:
         print(all_pet_stats[user_Request])
         Inventory_function()
-    else:
+    elif user_Request.startswith("sell "):
+        pet_to_sell = user_Request[5:].strip()
+        if pet_to_sell in Inventory:
+            sell_price = all_pet_stats[pet_to_sell]["rarity"] * 2
+            confirm = input(f"Are you sure you want to sell {pet_to_sell} for {sell_price}$? (Y/N): ").lower()
+            if confirm == 'y':
+                Inventory.remove(pet_to_sell)
+                all_pet_stats[pet_to_sell][rarity]
+                money += sell_price
+                if pet_to_sell in pet_levels:
+                    pet_levels[pet_to_sell] = 1
+                print(f"You have sold {pet_to_sell} for {sell_price}$.")
         main_menu()
     
 def shop():
