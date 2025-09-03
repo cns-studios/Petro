@@ -309,7 +309,10 @@ class Game:
         action = parts[0] if parts else ""
         message = ""
 
-        if action == "save":
+        if action == "get_state":
+            # Just return the current state without any changes
+            return self.get_state("Welcome back!")
+        elif action == "save":
             if push_state(self.username, self):
                 message = "Game saved successfully."
             else:

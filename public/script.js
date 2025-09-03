@@ -19,6 +19,80 @@ const signupResultEl = document.getElementById('signup-result');
 const saveBtn = document.getElementById('save-btn');
 
 let ws;
+let currentUsername = null;
+let currentPin = null;
+
+// --- Cookie Management ---
+function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function deleteCookie(name) {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+}
+
+// --- Check for saved credentials on page load ---
+window.addEventListener('DOMContentLoaded', async () => {
+    const savedUsername = getCookie('username');
+    const savedPin = getCookie('pin');
+    
+    if (savedUsername && savedPin) {
+        // Try to auto-login with saved credentials
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: savedUsername, pin: savedPin })
+            });
+
+            if (response.ok) {
+                console.log('Auto-login successful');
+                currentUsername = savedUsername;
+                currentPin = savedPin;
+                authContainer.style.display = 'none';
+                gameContainer.style.display = 'block';
+                connectWebSocket(savedUsername, savedPin);
+            } else {
+                // Invalid saved credentials, clear them
+                deleteCookie('username');
+                deleteCookie('pin');
+                console.log('Auto-login failed, invalid saved credentials');
+            }
+        } catch (error) {
+            console.error('Auto-login error:', error);
+            deleteCookie('username');
+            deleteCookie('pin');
+        }
+    }
+});
+
+// --- Add logout button handler ---
+function logout() {
+    deleteCookie('username');
+    deleteCookie('pin');
+    currentUsername = null;
+    currentPin = null;
+    if (ws) {
+        ws.close();
+    }
+    gameContainer.style.display = 'none';
+    authContainer.style.display = 'block';
+    loginUsernameEl.value = '';
+    loginPinEl.value = '';
+}
 
 // --- Auth UI Logic ---
 showSignupBtn.addEventListener('click', (e) => {
@@ -83,6 +157,13 @@ loginBtn.addEventListener('click', async () => {
 
         if (response.ok) {
             console.log('Login successful');
+            currentUsername = username;
+            currentPin = pin;
+            
+            // Save credentials in cookies (expires in 7 days)
+            setCookie('username', username, 7);
+            setCookie('pin', pin, 7);
+            
             authContainer.style.display = 'none';
             gameContainer.style.display = 'block';
             connectWebSocket(username, pin);
@@ -134,12 +215,22 @@ const BUFF_DESCRIPTIONS = {
     13: "+1 Level for all Pets",
 };
 
+let stateRequestTimeout = null;
+
 function connectWebSocket(username, pin) {
     ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
 
     ws.onopen = () => {
         console.log('Connected to the server.');
-        messageEl.textContent = 'Connected! Welcome back.';
+        messageEl.textContent = 'Connected! Loading game state...';
+        
+        // Request initial state after a short delay to ensure game process is ready
+        stateRequestTimeout = setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Requesting initial game state...');
+                ws.send('get_state');
+            }
+        }, 100);
     };
 
     ws.onmessage = (event) => {
@@ -150,8 +241,19 @@ function connectWebSocket(username, pin) {
     ws.onclose = (event) => {
         console.log('Disconnected from the server.', event.reason);
         messageEl.textContent = `Connection lost: ${event.reason || 'Please refresh'}`;
-        gameContainer.style.display = 'none';
-        authContainer.style.display = 'block';
+        
+        // Clear any pending state request
+        if (stateRequestTimeout) {
+            clearTimeout(stateRequestTimeout);
+            stateRequestTimeout = null;
+        }
+        
+        // Don't automatically show auth container if we have saved credentials
+        // This allows for reconnection attempts
+        if (!getCookie('username') || !getCookie('pin')) {
+            gameContainer.style.display = 'none';
+            authContainer.style.display = 'block';
+        }
     };
 
     ws.onerror = (error) => {
@@ -167,7 +269,7 @@ function updateUI(state) {
     if (state.message) {
         messageEl.textContent = state.message;
         // Clear the message after a few seconds if it's a status update
-        if (state.message !== 'Choose a buff.') {
+        if (state.message !== 'Choose a buff.' && !state.message.includes('Welcome')) {
             setTimeout(() => {
                 if (messageEl.textContent === state.message) {
                     messageEl.textContent = '';
