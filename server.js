@@ -7,6 +7,7 @@ const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 
 
+const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -29,18 +30,25 @@ const gameInstances = new Map();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-function createGameProcess(username, gameState = null) {
-    console.log(`[Game] Spawning new game process for user: ${username}`);
-    const gameProcess = spawn('py', ['-u', 'game.py']);
-    gameInstances.set(username, gameProcess);
-
-    if (gameState) {
-        console.log(`[Game] Loading existing game state for ${username}`);
-        gameProcess.stdin.write(gameState + '\n');
+function createGameProcess(username) {
+    // Check if we're already creating a process for this user
+    if (connectionAttempts.has(username)) {
+        console.log(`[Game] Process creation already in progress for ${username}`);
+        return connectionAttempts.get(username);
     }
+
+    console.log(`[Game] Spawning new game process for user: ${username}`);
+    
+    // Determine the correct Python command based on OS
+    const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
+    const gameProcess = spawn(pythonCmd, ['-u', 'game.py', username]);
+    
+    connectionAttempts.set(username, gameProcess);
+    gameInstances.set(username, gameProcess);
 
     gameProcess.on('spawn', () => {
         console.log(`[Game] Successfully spawned process for ${username} with PID: ${gameProcess.pid}`);
+        connectionAttempts.delete(username);
     });
 
     gameProcess.stderr.on('data', (data) => {
@@ -50,6 +58,13 @@ function createGameProcess(username, gameState = null) {
     gameProcess.on('close', (code) => {
         console.log(`[Game] Process for ${username} exited with code ${code}`);
         gameInstances.delete(username);
+        connectionAttempts.delete(username);
+    });
+
+    gameProcess.on('error', (err) => {
+        console.error(`[Game] Failed to start process for ${username}:`, err);
+        gameInstances.delete(username);
+        connectionAttempts.delete(username);
     });
 
     return gameProcess;
@@ -117,51 +132,54 @@ wss.on('connection', (ws, req) => {
         let gameProcess = gameInstances.get(username);
         if (!gameProcess || gameProcess.killed) {
             console.log(`[Server] No live game process for ${username}. Creating new one.`);
-            gameProcess = createGameProcess(username, user.game_state);
+            gameProcess = createGameProcess(username);
         }
 
         const onData = (data) => {
             const output = data.toString();
             output.split('\n').filter(line => line.trim() !== '').forEach(line => {
-                if (line.startsWith('SAVE_STATE:')) {
-                    const gameState = line.substring('SAVE_STATE:'.length);
-                    db.run('UPDATE users SET game_state = ? WHERE username = ?', [gameState, username], (err) => {
-                        if (err) {
-                            console.error(`[Server] Failed to save game state for ${username}:`, err.message);
-                        } else {
-                            console.log(`[Server] Successfully saved game state for ${username}.`);
-                            if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ message: 'Game saved successfully!' }));
-                            }
-                        }
-                    });
-                } else {
-                     if (ws.readyState === WebSocket.OPEN) {
-                        console.log(`[Game -> Server] (User: ${username}): ${line.trim()}`);
-                        ws.send(line);
-                    }
+                if (ws.readyState === WebSocket.OPEN) {
+                    console.log(`[Game -> Server] (User: ${username}): ${line.trim()}`);
+                    ws.send(line);
                 }
             });
         };
 
+        const onProcessClose = (code) => {
+            console.log(`[Server] Game process closed unexpectedly for ${username}`);
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close(1011, 'Game process terminated');
+            }
+            cleanup();
+        };
+
+        const cleanup = () => {
+            gameProcess.stdout.removeListener('data', onData);
+            gameProcess.removeListener('close', onProcessClose);
+        };
+
         gameProcess.stdout.on('data', onData);
+        gameProcess.once('close', onProcessClose);
 
         ws.on('message', (message) => {
             const command = message.toString();
             console.log(`[Client -> Server] (User: ${username}) Received command: ${command}`);
-            if (command === 'save') {
-                console.log(`[Server] Save command received for ${username}.`);
+            if (!gameProcess.killed) {
+                gameProcess.stdin.write(command + '\n');
             }
-            gameProcess.stdin.write(command + '\n');
         });
 
         ws.on('close', () => {
             console.log(`[Server] WebSocket closed for user: ${username}.`);
-            gameProcess.stdout.removeListener('data', onData);
+            cleanup();
+        });
+
+        ws.on('error', (error) => {
+            console.error(`[Server] WebSocket error for user ${username}:`, error);
+            cleanup();
         });
     });
 });
-
 
 app.use((req, res) => {
     res.status(404).send('File not found');

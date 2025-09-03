@@ -130,7 +130,7 @@ const BUFF_DESCRIPTIONS = {
     9: "+5 HP for all Legendary Pets",
     10: "+1 Money for every Pet in Inventory",
     11: "+2 Money for every Common Pet and -1 for each Rare Pet in Inventory",
-    12: "Dubble the Money you have (Max. 25)",
+    12: "Double the Money you have (Max. 25)",
     13: "+1 Level for all Pets",
 };
 
@@ -218,18 +218,27 @@ function updateUI(state) {
 function buy(item) {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(`shop_buy ${item}`);
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
     }
 }
 
 function rerollShop() {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('shop_reroll');
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
     }
 }
 
 function selectBuff(index) {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(`select_buff ${index}`);
+        buffSelectionModal.style.display = 'none';
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
     }
-    buffSelectionModal.style.display = 'none';
 }
