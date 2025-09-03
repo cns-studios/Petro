@@ -189,7 +189,7 @@ class Game:
                     self.pending_buff_choices = random.sample(available_buffs, 3)
                     buff_descriptions = {
                         1: "+1 Attack for all Pets", 2: "+1 HP for all Pets",
-                        3: "+2% Dodge Chance for all Pets",4: "+2 Attack for all Common Pets"", 13: +1 Level for all Pets",
+                        3: "+2% Dodge Chance for all Pets",4: "+2 Attack for all Common Pets", 
                         5: "+2 HP for all Common Pets", 6: "+3 Attack for all Rare Pets",
                         7: "+3 HP for all Rare Pets", 8: "+5 Attack for all Legendary Pets",
                         9: "+5 HP for all Legendary Pets", 10: "+1 Money for every Pet in Inventory",
