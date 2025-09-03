@@ -138,14 +138,14 @@ class Game:
             for pet in self.inventory: 
                 self.all_pet_stats[pet]["hp"] += 1
         elif buff_id == 3:
-            message += "+2% Dodge Chance for all Pets"
+            message = "+2% Dodge Chance for all Pets"
             for pet in self.inventory:
                 if self.all_pet_stats[pet]["dodge_chance"] < 98:
                     self.all_pet_stats[pet]["dodge_chance"] += 2
                 else: 
                     self.all_pet_stats[pet]["dodge_chance"] = 99
         elif buff_id == 4:
-            message += "+2 Attack for all Common Pets"
+            message = "+2 Attack for all Common Pets"
             for pet in self.inventory:
                 if self.all_pet_stats[pet]["rarity"] == 1:  # Common pets have rarity 1
                     self.all_pet_stats[pet]["attack"] += 2
@@ -195,7 +195,7 @@ class Game:
             self.money += money_to_add
             message += f". You have got {money_to_add} Money"
         elif buff_id == 13:
-            message += "+1 Level for all Pets"
+            message = "+1 Level for all Pets"
             for pet in self.inventory:
                 if pet in self.pet_levels:
                     self.pet_levels[pet] += 1
