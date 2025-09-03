@@ -4,17 +4,39 @@ import random
 from assets.pets import all_pet_stats, common_pets, rare_pets, legendary_pets, pet_levels, all_pets
 
 class Game:
-    def __init__(self):
-        self.money = 50000
-        self.stage = 1
-        self.inventory = ["Worm"]
-        self.shop_refresh_price = 5
-        self.upgrade_pack = 0
-        self.legendary_upgrade_pack = 0
-        self.charakter_pack = 0
-        self.buff_pack = 0
-        self.pending_buff_choices = []
-        self.reroll_shop()
+    def __init__(self, state_json=None):
+        if state_json:
+            state = json.loads(state_json)
+            self.money = state.get('money', 50000)
+            self.stage = state.get('stage', 1)
+            self.inventory = [pet['name'] for pet in state.get('inventory', [])]
+            shop_state = state.get('shop', {})
+            self.shop_refresh_price = shop_state.get('shop_refresh_price', 5)
+            self.upgrade_pack = shop_state.get('upgrade_pack', 0)
+            self.legendary_upgrade_pack = shop_state.get('legendary_upgrade_pack', 0)
+            self.charakter_pack = shop_state.get('charakter_pack', 0)
+            self.buff_pack = shop_state.get('buff_pack', 0)
+            self.pending_buff_choices = state.get('pending_buff_choices', [])
+
+            for pet_details in state.get('inventory', []):
+                pet_name = pet_details.get('name')
+                if pet_name:
+                    pet_levels[pet_name] = pet_details.get('level', 1)
+                    if pet_name in all_pet_stats:
+                        all_pet_stats[pet_name]['attack'] = pet_details.get('attack', all_pet_stats[pet_name].get('attack'))
+                        all_pet_stats[pet_name]['hp'] = pet_details.get('hp', all_pet_stats[pet_name].get('hp'))
+                        all_pet_stats[pet_name]['dodge_chance'] = pet_details.get('dodge_chance', all_pet_stats[pet_name].get('dodge_chance'))
+        else:
+            self.money = 50000
+            self.stage = 1
+            self.inventory = ["Worm"]
+            self.shop_refresh_price = 5
+            self.upgrade_pack = 0
+            self.legendary_upgrade_pack = 0
+            self.charakter_pack = 0
+            self.buff_pack = 0
+            self.pending_buff_choices = []
+            self.reroll_shop()
 
     def roll_packs(self, anzahl, chance):
         return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
@@ -24,6 +46,34 @@ class Game:
         self.legendary_upgrade_pack = self.roll_packs(5, 20)
         self.charakter_pack = self.roll_packs(3, 9)
         self.buff_pack = self.roll_packs(10, 2)
+
+    # pull_state("all_pets_stats")
+    def pull_state(self, things):
+        if things == "all":
+            return self.get_state()
+        elif things == "all_pets_stats":
+            inventory_details = []
+            for pet_name in self.inventory:
+                if pet_name in all_pet_stats:
+                    stats = all_pet_stats[pet_name]
+                    inventory_details.append({
+                        "name": pet_name,
+                        "level": pet_levels.get(pet_name, 1),
+                        "attack": stats.get("attack"),
+                        "hp": stats.get("hp"),
+                        "rarity": stats.get("rarity"),
+                        "dodge_chance": stats.get("dodge_chance")
+                    })
+            return inventory_details
+        elif things == "all_pets_level":
+            return {p: pet_levels.get(p, 1) for p in self.inventory}
+        elif things == "common_pets":
+            return [p for p in self.inventory if p in all_pet_stats and all_pet_stats[p].get("rarity") == 1]
+        elif things == "rare_pets":
+            return [p for p in self.inventory if p in all_pet_stats and all_pet_stats[p].get("rarity") == 2]
+        elif things == "legendary_pets":
+            return [p for p in self.inventory if p in all_pet_stats and all_pet_stats[p].get("rarity") > 2]
+        return None
 
     def get_state(self, message=""):
         inventory_details = []
@@ -270,10 +320,24 @@ def modify_two_pets_clean(pets: dict):
 
 
 if __name__ == "__main__":
-    game = Game()
-    print(json.dumps(game.get_state("Welcome to Petro!")))
-    sys.stdout.flush()
-
+    line = sys.stdin.readline().strip()
+    game = None
+    cmd = None
+    try:
+        json.loads(line)
+        game = Game(state_json=line)
+        print(json.dumps(game.get_state("Game loaded.")))
+        sys.stdout.flush()
+    except (json.JSONDecodeError, TypeError):
+        game = Game()
+        print(json.dumps(game.get_state("Welcome to Petro!")))
+        sys.stdout.flush()
+        if line:
+            cmd = line
+    if cmd:
+        state = game.process_command(cmd)
+        print(json.dumps(state))
+        sys.stdout.flush()
     for line in sys.stdin:
         command = line.strip()
         if command == "exit":
@@ -281,4 +345,3 @@ if __name__ == "__main__":
         state = game.process_command(command)
         print(json.dumps(state))
         sys.stdout.flush()
-
