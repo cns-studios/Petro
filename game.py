@@ -110,51 +110,51 @@ class Game:
             message += "+1 Attack for all Pets"
             for pet in self.inventory: all_pet_stats[pet]["attack"] += 1
         elif buff_id == 2:
-            message += "+1 HP for all Pets"
+            message = "+1 HP for all Pets"
             for pet in self.inventory: all_pet_stats[pet]["hp"] += 1
         elif buff_id == 3:
-            message += "+2% Dodge Chance for all Pets"
+            message = "+2% Dodge Chance for all Pets"
             for pet in self.inventory:
                 if all_pet_stats[pet]["dodge_chance"] < 98:
                     all_pet_stats[pet]["dodge_chance"] += 2
                 else: all_pet_stats[pet]["dodge_chance"] = 99
         elif buff_id == 4:
-            message += "+2 Attack for all Common Pets"
+            message = "+2 Attack for all Common Pets"
             for pet in self.inventory:
                 if pet in common_pets:
                     all_pet_stats[pet]["attack"] += 2
         elif buff_id == 5:
-            message += " +2 HP for all Common Pets"
+            message = " +2 HP for all Common Pets"
             for pet in self.inventory:
                 if pet in common_pets:
                     all_pet_stats[pet]["hp"] += 2
         elif buff_id == 6:
-            message += " +3 Attack for all Rare Pets"
+            message = " +3 Attack for all Rare Pets"
             for pet in self.inventory:
                 if pet in rare_pets:
                     all_pet_stats[pet]["attack"] += 3
         elif buff_id == 7:
-            message += " +3 HP for all Rare Pets"
+            message = " +3 HP for all Rare Pets"
             for pet in self.inventory:
                 if pet in rare_pets:
                     all_pet_stats[pet]["hp"] += 3
         elif buff_id == 8:
-            message += " +5 Attack for all Legendary Pets"
+            message = " +5 Attack for all Legendary Pets"
             for pet in self.inventory:
                 if pet in legendary_pets:
                     all_pet_stats[pet]["attack"] += 5
         elif buff_id == 9:
-            message += " +5 HP for all Legendary Pets"
+            message = " +5 HP for all Legendary Pets"
             for pet in self.inventory:
                 if pet in legendary_pets:
                     all_pet_stats[pet]["hp"] += 5
         elif buff_id == 10:
-            message += " +1 Money for every Pet in Inventory"
+            message = " +1 Money for every Pet in Inventory"
             money_1 = len(self.inventory)
-            message += f"You have got {money_1} Money"
+            message = f"You have got {money_1} Money"
             money += money_1
         elif buff_id == 11:
-            message += " +2 Money for every Common Pet and -1 for each Rare Pet in Inventory"
+            message = " +2 Money for every Common Pet and -1 for each Rare Pet in Inventory"
             for pet in self.inventory:
                 if all_pet_stats[pet]["rarity"] ==  1:  
                     money_2 += 2    
@@ -162,10 +162,10 @@ class Game:
                     money_2 -= 1 
                 else:
                     money_2 += 0
-            message += f"You have got {money_2} Money"
+            message = f"You have got {money_2} Money"
             money += money_2
         elif buff_id == 12:
-            message += " Dubble the Money you have (Max. 25)"
+            message = " Dubble the Money you have (Max. 25)"
             if money * 2 <= 25:
                 money *= 2
                 money += f"You have got {money/2} Money"
@@ -173,7 +173,7 @@ class Game:
                 money += "You have got 25 Money"
                 money += 25
         elif buff_id == 13:
-            message += "+1 Level for all Pets"
+            message = "+1 Level for all Pets"
             for pet in self.inventory:
                 if pet in pet_levels:
                     pet_levels[pet] += 1
