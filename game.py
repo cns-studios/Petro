@@ -221,16 +221,6 @@ class Game:
         
         return self.get_state(message)
     
-
-
-
-
-
-
-
-
-
-
 def modify_two_pets_clean(pets: dict):
     # Zwei zufällige Pets auswählen
     pet_1, pet_2 = random.sample(list(pets.keys()), 2)
@@ -277,23 +267,6 @@ def modify_two_pets_clean(pets: dict):
 
     return pet_1_original, pet_1_modified, pet_2_original, pet_2_modified, mod_pets, pet_1, pet_2
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
