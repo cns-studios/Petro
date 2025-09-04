@@ -88,12 +88,29 @@ function logout() {
     loginUsernameEl.value = '';
     loginPinEl.value = '';
 }
+function Petsell() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('sell_all_pets');
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
+    }
 
-showSignupBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginView.style.display = 'none';
-    signupView.style.display = 'block';
-});
+
+}
+function Sell_spezific_pet(item) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(`spezific_pet_sell ${item}`);
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
+    }
+}
+
+
+
+
+
 
 showLoginBtn.addEventListener('click', (e) => {
     e.preventDefault();

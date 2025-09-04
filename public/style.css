@@ -53,14 +53,28 @@ body {
 
 .pet-card {
     border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 8px;
+    padding: 15px;
     background-color: #fafafa;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.pet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .pet-card.rarity-common {
-    background-color: #0ba222;
+    background-color: #29a200;
     border-color: #008a20;
+}
+
+.pet-card.rarity-common:hover {
+    background-color: #02791c;
+    border-color: #0f5802;
+    
 }
 
 .pet-card.rarity-rare {
@@ -68,15 +82,22 @@ body {
     border-color: #0e1a77;
 }
 
+.pet-card.rarity-rare:hover {
+    background-color: #003a5f;
+    border-color: #000d58;
+    font-weight: bold;
+}
+
 .pet-card.rarity-legendary {
     background-color: #e7ca0d;
     border-color: #b69014;
 }
 
-.pet-card .name {
-    font-weight: bold;
+.pet-card.rarity-legendary:hover {
+    background-color: #b59702;
+    border-color: #876700;
+    
 }
-
 .shop-item {
     margin-bottom: 10px;
 }

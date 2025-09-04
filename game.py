@@ -296,6 +296,25 @@ class Game:
                 message = "Game saved successfully."
             else:
                 message = "Failed to save game."
+        elif action == "sell_all_pets":
+            if self.inventory:
+                total_sell_value = 0
+                num_sold_pets = len(self.inventory)
+                
+                for pet in self.inventory:
+                    # Verkaufswert für jedes Pet berechnen und zur Gesamtsumme addieren
+                    sell_value = self.all_pet_stats[pet]["rarity"] * 2 + (self.pet_levels.get(pet, 1) - 1)
+                    total_sell_value += sell_value
+                    
+                    # Pet-Level zurücksetzen (falls pet ein String ist)
+                    if pet in self.pet_levels:
+                        self.pet_levels[pet] = 1
+                
+                self.money += total_sell_value
+                self.inventory.clear()
+                message = f"Sold {num_sold_pets} pets for {total_sell_value} money."
+            else:
+                message = "No pets to sell."
         elif action == "shop_buy":
             if len(parts) < 2:
                 return self.get_state("Invalid command.")
