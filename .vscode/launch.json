@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "Launch Zen",
+        "request": "launch",
+        "type": "chrome",
+        "url": "http://localhost:8080",
+        "webRoot": "${workspaceFolder}/public",
+        "runtimeExecutable": "C:/Program Files/Zen Browser/zen.exe"
+    },  
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Node Server",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server.js"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch Server & Chrome",
+            "configurations": ["Launch Node Server", "Launch Zen"]
+        }
+    ]
+}
