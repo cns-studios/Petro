@@ -118,6 +118,12 @@ showLoginBtn.addEventListener('click', (e) => {
     loginView.style.display = 'block';
 });
 
+showSignupBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signupView.style.display = 'block';
+    loginView.style.display = 'none';
+})
+
 signupBtn.addEventListener('click', async () => {
     const username = signupUsernameEl.value;
     if (!username) {
