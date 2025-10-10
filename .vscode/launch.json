@@ -5,27 +5,31 @@
     "version": "0.2.0",
     "configurations": [
     {
-        "name": "Launch Zen",
-        "request": "launch",
-        "type": "chrome",
-        "url": "http://localhost:8080",
-        "webRoot": "${workspaceFolder}/public",
-        "runtimeExecutable": "C:/Program Files/Zen Browser/zen.exe"
-    },  
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Node Server",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/server.js"
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Launch Server & Chrome",
-            "configurations": ["Launch Node Server", "Launch Zen"]
-        }
+      "name": "Start Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm start",
+      "preLaunchTask": "npm: install"
+    },
+    {
+      "name": "Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--auto-open-devtools-for-tabs"
+      ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Server & Client",
+      "configurations": [
+        "Start Server",
+        "Launch Chrome"
+      ],
+      "stopAll": true
+    }
     ]
 }
