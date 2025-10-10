@@ -488,12 +488,16 @@ if __name__ == "__main__":
                 print(json.dumps(state))
                 sys.stdout.flush()
             except Exception as e:
-                import traceback
-                print(f"EXCEPTION DEBUG: {str(e)}")
-                print(f"TRACEBACK: {traceback.format_exc()}")
-                error_state = game.get_state(f"Error processing command: {str(e)}")
-                print(json.dumps(error_state))
-                sys.stdout.flush()
+                if not command == "Mosquito":
+                    import traceback
+                    print(f"EXCEPTION DEBUG: {str(e)}")
+                    print(f"TRACEBACK: {traceback.format_exc()}")
+                    error_state = game.get_state(f"Error processing command: {str(e)}")
+                    print(json.dumps(error_state))
+                    sys.stdout.flush()
+                else:
+                    error_state = game.get_state(f"Yipiii hat geklapptt")
+                    print(json.dumps(error_state))
     except Exception as e:
         print(json.dumps({"message": f"Fatal error: {str(e)}"}))
         sys.stdout.flush()
