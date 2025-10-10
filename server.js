@@ -178,6 +178,10 @@ wss.on('connection', (ws, req) => {
     });
 });
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 app.use((req, res) => {
     res.status(404).send('File not found');
 });
