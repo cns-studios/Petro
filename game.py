@@ -101,7 +101,7 @@ class Game:
         state = pull_state(username)
         
         if state:
-            self.money = state.get('money', 50000)
+            self.money = state.get('money', 5000)
             self.stage = state.get('stage', 1)
             self.inventory = []
             
