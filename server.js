@@ -5,6 +5,7 @@ const path = require('path');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
+const fs = require('fs')
 
 const connectionAttempts = new Map();
 const app = express();
@@ -22,7 +23,17 @@ const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) =>
             game_state TEXT
         )`);
     }
-});
+});if (!fs.existsSync(path.join(__dirname, 'db', 'users.db'))) {
+    console.log('No database found, creating a new one.');
+    db.serialize(() => {
+        db.run(`CREATE TABLE users (
+            username TEXT PRIMARY KEY,
+            pin TEXT NOT NULL,
+            game_state TEXT
+        )`);
+    });
+}
+
 
 const gameInstances = new Map();
 
@@ -176,6 +187,10 @@ wss.on('connection', (ws, req) => {
             cleanup();
         });
     });
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.use((req, res) => {
