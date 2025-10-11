@@ -70,3 +70,44 @@ saveBtn.addEventListener('click', () => {
     }
 });
 
+
+function  WebSocket(username, pin) {
+    ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
+
+    ws.onopen = () => {
+        console.log('Connected to the server.');
+        messageEl.textContent = 'Connected! Loading game state...';
+        
+        stateRequestTimeout = setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Requesting initial game state...');
+                ws.send('get_state');
+            }
+        }, 100);
+    };
+
+    ws.onmessage = (event) => {
+        const gameState = JSON.parse(event.data);
+        updateUI(gameState);
+    };
+
+    ws.onclose = (event) => {
+        console.log('Disconnected from the server.', event.reason);
+        messageEl.textContent = `Connection lost: ${event.reason || 'Please refresh'}`;
+        
+        if (stateRequestTimeout) {
+            clearTimeout(stateRequestTimeout);
+            stateRequestTimeout = null;
+        }
+        
+        // If connection is closed (e.g. invalid credentials), redirect to login
+        if (!event.wasClean) {
+            window.location.href = '/login.html';
+        }
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        messageEl.textContent = 'A connection error occurred.';
+    };
+}

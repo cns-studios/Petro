@@ -93,7 +93,7 @@ document.getElementById('save-btn').addEventListener('click', () => {
     }
 });
 
-function connectWebSocket(username, pin) {
+function  cket(username, pin) {
     ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
 
     ws.onopen = () => {
