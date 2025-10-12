@@ -215,42 +215,46 @@ class Game:
             else:
                 message = "Failed to save game."
         elif action == "sell_all_pets":
-            if self.inventory:
-                total_sell_value = 0
-                num_sold_pets = len(self.inventory)
-                
-                for pet in self.inventory:
-                    # Verkaufswert für jedes Pet berechnen und zur Gesamtsumme addieren
-                    sell_value = self.all_pet_stats[pet]["rarity"] * 2 + (self.pet_levels.get(pet, 1) - 1)
-                    total_sell_value += sell_value
+                if self.inventory:
+                    total_sell_value = 0
+                    num_sold_pets = len(self.inventory)
                     
-                    # Pet-Level zurücksetzen (falls pet ein String ist)
-                    if pet in self.pet_levels:
-                        self.pet_levels[pet] = 1
+                    # copy of inventory to iterate over
+                    pets_to_sell = self.inventory.copy()
+                    
+                    for pet in pets_to_sell:
+                        # Calculate sell value for each pet
+                        sell_value = self.all_pet_stats[pet]["rarity"] * 2 + (self.pet_levels.get(pet, 1) - 1)
+                        total_sell_value += sell_value
+                        
+                        # Reset pet level
+                        if pet in self.pet_levels:
+                            self.pet_levels[pet] = 1
 
-                    rarity = self.all_pet_stats[pet]["rarity"]
-                    if rarity == 1 and pet not in self.available_common_pets:
-                        self.available_common_pets.append(pet)
-                    elif rarity == 2 and pet not in self.available_rare_pets:
-                        self.available_rare_pets.append(pet)
-                    elif rarity == 3 and pet not in self.available_legendary_pets:
-                        self.available_legendary_pets.append(pet)
-                self.money += total_sell_value
-                self.inventory.remove(pet)  # Entferne das Pet aus dem Inventar
-                message = f"Sold {num_sold_pets} pets for {total_sell_value} money."
-            else:
-                message = "No pets to sell."
+                        # Add pet back to available pets
+                        rarity = self.all_pet_stats[pet]["rarity"]
+                        if rarity == 1 and pet not in self.available_common_pets:
+                            self.available_common_pets.append(pet)
+                        elif rarity == 2 and pet not in self.available_rare_pets:
+                            self.available_rare_pets.append(pet)
+                        elif rarity == 3 and pet not in self.available_legendary_pets:
+                            self.available_legendary_pets.append(pet)
+                        
+                        # Remove pet from inventory
+                        self.inventory.remove(pet)
+                    
+                    self.money += total_sell_value
+                    message = f"Sold {num_sold_pets} pets for {total_sell_value} money."
+                else:
+                    message = "No pets to sell."
 
         elif action == "spezific_pet_sell":
             if len(parts) < 2:
                 return self.get_state("Invalid command.")
             
             pet_name = " ".join(parts[1:])
-            print(f"spezifisches pet: '{pet_name}'")
             
-            print(f"DEBUG inventory (strings): {self.inventory}")
-            
-            # Suche in String-Liste (case-insensitive)
+            # Search in string list (case-insensitive)
             matching_pet_name = None
             for pet_string in self.inventory:
                 if pet_string.lower() == pet_name.lower():
@@ -258,32 +262,32 @@ class Game:
                     break
             
             if matching_pet_name:
-                # Berechne Verkaufswert
-                total_sell_value = 0
-                sell_value = self.all_pet_stats[matching_pet_name]["rarity"] * 2 + (self.pet_levels.get(matching_pet_name, 1) - 1)
-                total_sell_value += sell_value
+                # Calculate sell value before resetting anything (....)
+                pet_rarity = self.all_pet_stats[matching_pet_name]["rarity"]
+                pet_level = self.pet_levels.get(matching_pet_name, 1)
+                sell_value = pet_rarity * 2 + (pet_level - 1)
                 
-                # Pet-Level zurücksetzen
+                # Add money
+                self.money += sell_value
+                
+                # Remove pet from inventory
+                self.inventory.remove(matching_pet_name)
+                
+                # Reset pet level for future use
                 if matching_pet_name in self.pet_levels:
                     self.pet_levels[matching_pet_name] = 1
                 
-                # Geld hinzufügen und Pet entfernen
-                self.money += total_sell_value
-
-
-                self.inventory.remove(matching_pet_name)
-                rarity = self.all_pet_stats[pet_name]["rarity"]
-                if rarity == 1 and pet_name not in self.available_common_pets:
-                    self.available_common_pets.append(pet_name)
-                elif rarity == 2 and pet_name not in self.available_rare_pets:
-                    self.available_rare_pets.append(pet_name)
-                elif rarity == 3 and pet_name not in self.available_legendary_pets:
-                    self.available_legendary_pets.append(pet_name)  # Füge das Pet wieder hinzu, um den Index zu erhalten
-                message = f"Sold {matching_pet_name} for {total_sell_value} money."
-                print(f"SUCCESS: Sold {matching_pet_name} for {total_sell_value}")
+                # Add pet back to available pets pool
+                if pet_rarity == 1 and matching_pet_name not in self.available_common_pets:
+                    self.available_common_pets.append(matching_pet_name)
+                elif pet_rarity == 2 and matching_pet_name not in self.available_rare_pets:
+                    self.available_rare_pets.append(matching_pet_name)
+                elif pet_rarity == 3 and matching_pet_name not in self.available_legendary_pets:
+                    self.available_legendary_pets.append(matching_pet_name)
+                
+                message = f"Sold {matching_pet_name} for {sell_value} money."
             else:
                 message = f"Pet {pet_name} not found in inventory."
-                print(f"NOT FOUND: Available pets: {self.inventory}")
         elif action == "shop_buy":
             if len(parts) < 2:
                 return self.get_state("Invalid command.")
