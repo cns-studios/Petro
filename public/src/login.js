@@ -89,8 +89,6 @@ loginBtn.addEventListener('click', async () => {
     const username = loginUsernameEl.value.trim();
     const pin = loginPinEl.value.trim();
 
-    console.log('Login attempt:', { username, pin }); // DEBUG
-
     if (!username || !pin) {
         alert('Please enter both username and PIN.');
         return;
@@ -104,21 +102,19 @@ loginBtn.addEventListener('click', async () => {
         });
 
         const result = await response.json();
-        console.log('Login response:', result); // DEBUG
+        console.log('Login response:', result);
 
         if (response.ok) {
             console.log('Login successful, setting cookies...');
             
-            // Set cookies
             setCookie('username', username, 7);
             setCookie('pin', pin, 7);
             
-            // Verify cookies were set
             const verifyUsername = getCookie('username');
             const verifyPin = getCookie('pin');
-            console.log('Cookies set:', { verifyUsername, verifyPin }); // DEBUG
+            console.log('Cookies set:', { verifyUsername, verifyPin });
             
-            // Small delay to ensure cookies are written
+            // Small delay for cookie writting
             setTimeout(() => {
                 window.location.href = '/game.html';
             }, 100);

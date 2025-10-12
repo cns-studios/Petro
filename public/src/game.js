@@ -11,8 +11,6 @@ function logout() {
     window.location.href = '/login.html';
 }
 
-
-
 //Cookie Handler
 function setCookie(name, value, days) {
     const expires = new Date();
@@ -34,7 +32,6 @@ function getCookie(name) {
 function deleteCookie(name) {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
-
 
 
 // Check authentication on page load
@@ -137,7 +134,6 @@ function Petsell() {
 }
 
 function Sell_spezific_pet(item) {
-    // This function is now handled by the click event on the pet card
     messageEl.textContent = 'Click on the pet you want to sell.';
 }
 
