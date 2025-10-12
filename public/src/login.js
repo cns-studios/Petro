@@ -27,7 +27,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                window.location.href = '/game.html';
+                window.location.href = '/game';
                 return;
             } else {
                 // Invalid cookies, clear them
@@ -116,7 +116,7 @@ loginBtn.addEventListener('click', async () => {
             
             // Small delay for cookie writting
             setTimeout(() => {
-                window.location.href = '/game.html';
+                window.location.href = '/game';
             }, 100);
         } else {
             alert(`Login failed: ${result.message}`);

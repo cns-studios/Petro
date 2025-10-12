@@ -8,7 +8,7 @@ function logout() {
     if (ws) {
         ws.close();
     }
-    window.location.href = '/login.html';
+    window.location.href = '/login';
 }
 
 //Cookie Handler
@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const pin = getCookie('pin');
 
     if (!username || !pin) {
-        window.location.href = '/login.html';
+        window.location.href = '/login';
     } else {
         connectWebSocket(username, pin);
     }
@@ -112,7 +112,7 @@ function connectWebSocket(username, pin) {
             setTimeout(() => {
                 deleteCookie('username');
                 deleteCookie('pin');
-                window.location.href = '/login.html';
+                window.location.href = '/login';
             }, 2000);
         }
     };
