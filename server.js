@@ -49,7 +49,7 @@ function createGameProcess(username) {
     console.log(`[Game] Spawning new game process for user: ${username}`);
     
     const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
-    const gameProcess = spawn(pythonCmd, ['-u', path.join(__dirname, 'source', 'logic.py'), username]);
+    const gameProcess = spawn(pythonCmd, ['-u', path.join(__dirname, 'src', 'logic.py'), username]);
     
     connectionAttempts.set(username, gameProcess);
     gameInstances.set(username, gameProcess);

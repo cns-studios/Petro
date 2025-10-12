@@ -6,7 +6,7 @@ import os
 import copy
 from assets.pets import all_pet_stats as global_pet_stats, common_pets as global_common_pets, rare_pets as global_rare_pets, legendary_pets as global_legendary_pets, pet_levels as global_pet_levels, all_pets
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'db', 'users.db') if os.path.dirname(__file__) else os.path.join('db', 'users.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'db', 'users.db')
 
 def push_state(username, game):
     if not username:
