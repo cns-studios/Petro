@@ -1,5 +1,19 @@
 let ws;
+let stateRequestTimeout = null;
 
+// Cookie and auth functions
+function logout() {
+    deleteCookie('username');
+    deleteCookie('pin');
+    if (ws) {
+        ws.close();
+    }
+    window.location.href = '/login.html';
+}
+
+
+
+//Cookie Handler
 function setCookie(name, value, days) {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -21,15 +35,9 @@ function deleteCookie(name) {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
 
-function logout() {
-    deleteCookie('username');
-    deleteCookie('pin');
-    if (ws) {
-        ws.close();
-    }
-    window.location.href = '/login.html';
-}
 
+
+// Check authentication on page load
 window.addEventListener('DOMContentLoaded', () => {
     const username = getCookie('username');
     const pin = getCookie('pin');
@@ -71,29 +79,9 @@ const BUFF_DESCRIPTIONS = {
     13: "+1 Level for all Pets",
 };
 
-let stateRequestTimeout = null;
-
-function Petsell() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send('sell_all_pets');
-    } else {
-        messageEl.textContent = 'Connection lost. Please refresh the page.';
-        console.error('WebSocket is not connected');
-    }
-}
-
-function Sell_spezific_pet(item) {
-    // This function is now handled by the click event on the pet card
-    messageEl.textContent = 'Click on the pet you want to sell.';
-}
-
-document.getElementById('save-btn').addEventListener('click', () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send('save');
-    }
-});
-
-function  cket(username, pin) {
+function connectWebSocket(username, pin) {
+    console.log('Attempting to connect with:', { username, pin }); // DEBUG
+    
     ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
 
     ws.onopen = () => {
@@ -115,6 +103,7 @@ function  cket(username, pin) {
 
     ws.onclose = (event) => {
         console.log('Disconnected from the server.', event.reason);
+        console.log('Event code:', event.code, 'Was clean:', event.wasClean); // DEBUG
         messageEl.textContent = `Connection lost: ${event.reason || 'Please refresh'}`;
         
         if (stateRequestTimeout) {
@@ -122,9 +111,12 @@ function  cket(username, pin) {
             stateRequestTimeout = null;
         }
         
-        // If connection is closed (e.g. invalid credentials), redirect to login
-        if (!event.wasClean) {
-            window.location.href = '/login.html';
+        if (!event.wasClean || event.code === 1008) {
+            setTimeout(() => {
+                deleteCookie('username');
+                deleteCookie('pin');
+                window.location.href = '/login.html';
+            }, 2000);
         }
     };
 
@@ -133,6 +125,28 @@ function  cket(username, pin) {
         messageEl.textContent = 'A connection error occurred.';
     };
 }
+
+
+function Petsell() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('sell_all_pets');
+    } else {
+        messageEl.textContent = 'Connection lost. Please refresh the page.';
+        console.error('WebSocket is not connected');
+    }
+}
+
+function Sell_spezific_pet(item) {
+    // This function is now handled by the click event on the pet card
+    messageEl.textContent = 'Click on the pet you want to sell.';
+}
+
+document.getElementById('save-btn').addEventListener('click', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('save');
+    }
+});
+
 
 function updateUI(state) {
     if (state.money !== undefined) moneyEl.textContent = state.money;
@@ -155,7 +169,7 @@ function updateUI(state) {
         const petCard = document.createElement('div');
         petCard.className = 'pet-card';
         petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
-        petCard.style.cursor = 'cursor';
+        petCard.style.cursor = 'pointer';
         petCard.innerHTML = `
             <div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
@@ -169,7 +183,8 @@ function updateUI(state) {
                     messageEl.textContent = 'Connection lost. Please refresh the page.';
                     console.error('WebSocket is not connected');
     }
-        });
+                }
+        );
         inventoryEl.appendChild(petCard);
     });
     }
@@ -223,68 +238,4 @@ function selectBuff(index) {
         messageEl.textContent = 'Connection lost. Please refresh the page.';
         console.error('WebSocket is not connected');
     }
-}           <div>Dodge: ${pet.dodge_chance}%</div>
-            <div>Rarity: ${pet.rarity}</div>
-        `;
-        petCard.addEventListener('click', () => {
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(`spezific_pet_sell ${pet.name}`);
-                } else {
-                    messageEl.textContent = 'Connection lost. Please refresh the page.';
-                    console.error('WebSocket is not connected');
-    }
-        });
-        inventoryEl.appendChild(petCard);
-    });
-    }
-
-    if (state.shop) {
-        shopUpEl.textContent = state.shop.upgrade_pack;
-        shopBpEl.textContent = state.shop.buff_pack;
-        shopCpEl.textContent = state.shop.charakter_pack;
-        shopLupEl.textContent = state.shop.legendary_upgrade_pack;
-        rerollPriceEl.textContent = state.shop.shop_refresh_price;
-    }
-
-    if (state.pending_buff_choices && state.pending_buff_choices.length > 0) {
-        buffChoicesEl.innerHTML = '';
-        state.pending_buff_choices.forEach((buffId, index) => {
-            const choiceDiv = document.createElement('div');
-            choiceDiv.className = 'buff-choice';
-            choiceDiv.textContent = BUFF_DESCRIPTIONS[buffId] || `Unknown Buff ${buffId}`;
-            choiceDiv.onclick = () => selectBuff(index);
-            buffChoicesEl.appendChild(choiceDiv);
-        });
-        buffSelectionModal.style.display = 'flex';
-    } else {
-        buffSelectionModal.style.display = 'none';
-    }
-}
-
-function buy(item) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(`shop_buy ${item}`);
-    } else {
-        messageEl.textContent = 'Connection lost. Please refresh the page.';
-        console.error('WebSocket is not connected');
-    }
-}
-
-function rerollShop() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send('shop_reroll');
-    } else {
-        messageEl.textContent = 'Connection lost. Please refresh the page.';
-        console.error('WebSocket is not connected');
-    }
-}
-
-function selectBuff(index) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(`select_buff ${index}`);
-        buffSelectionModal.style.display = 'none';
-    } else {
-        messageEl.textContent = 'Connection lost. Please refresh the page.';
-        console.error('WebSocket is not connected');
-    }
-}
+ }

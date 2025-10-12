@@ -190,6 +190,14 @@ wss.on('connection', (ws, req) => {
 });
 
 app.get('/', (req, res) => {
+    res.redirect(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/game', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'game.html'));
+});
+
+app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
