@@ -1,16 +1,6 @@
 let ws;
 let stateRequestTimeout = null;
 
-// Cookie and auth functions
-function logout() {
-    deleteCookie('username');
-    deleteCookie('pin');
-    if (ws) {
-        ws.close();
-    }
-    window.location.href = '/login';
-}
-
 //Cookie Handler
 function setCookie(name, value, days) {
     const expires = new Date();
@@ -56,7 +46,7 @@ function connectWebSocket(username, pin) {
         stateRequestTimeout = setTimeout(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 console.log('Requesting matchmaking queue...');
-                ws.send('add_matchmaking_queue');
+
             }
         }, 100);
     };
@@ -87,4 +77,8 @@ function connectWebSocket(username, pin) {
     ws.onerror = (error) => {
         console.error('WebSocket error:', error);
     };
-}
+};
+
+function updateUI(state) {
+
+};

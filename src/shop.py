@@ -209,8 +209,6 @@ class Game:
 
         if action == "get_state":
             return self.get_state("Welcome back!")
-        elif action == "":
-            return message("")
         elif action == "save":
             if push_state(self.username, self):
                 message = "Game saved successfully."

@@ -173,6 +173,7 @@ wss.on('connection', (ws, req) => {
             const command = message.toString();
             console.log(`[Client -> Server] (User: ${username}) Received command: ${command}`);
             if (!gameProcess.killed) {
+                if (command == "add_matchmaking_queue")
                 gameProcess.stdin.write(command + '\n');
             }
         });
@@ -203,7 +204,7 @@ app.get('/login', (req, res) => {
 
 app.get('/matchmaking', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'matchmaking.html'));
-    console.log('Matchmaking for user:', req.query.username)
+    console.log(`[Server] New Matchmaking attempt`)
 });
 
 app.use((req, res) => {
