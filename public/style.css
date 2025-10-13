@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+
 body {
     font-family: sans-serif;
     background-color: #f0f0f0;
@@ -7,6 +9,18 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+}
+#home {
+    position:fixed;
+    text-align: center;
+    margin: 0;
+    top: 130px;
+}
+
+#home h1 {
+    margin-top: 0;
+    padding-top: 10px; 
+    font-size: 2.5rem;
 }
 
 #game-container {
@@ -46,10 +60,11 @@ body {
 }
 
 #inventory {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
 }
+
 
 .pet-card {
     border: 1px solid #ccc;
@@ -60,7 +75,13 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
-
+.pet-card img {
+    width: 100px;   /* Bildgröße reduziert */
+    height: 100px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 6px auto;
+}
 .pet-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -105,7 +126,7 @@ body {
 button {
     padding: 8px 12px;
     border: none;
-    background-color: #007bff;
+    background-color: rgb(25, 100, 126);
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -196,3 +217,172 @@ button:hover {
     margin-top: 10px;
     border-radius: 15px;
 }
+
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    position: fixed;
+    top: 0;
+    
+
+}
+
+header h1 {
+    margin: 0;
+    color: transparent;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Pixelify Sans';
+    background-image: linear-gradient(to bottom, red, yellow);
+    background-clip: text;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+    color: white;
+    font-weight: 500;
+}
+
+.buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+header button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    color: white;
+}
+button
+header button:hover {
+    opacity: 0.9;
+}
+
+#save-btn {
+    background-color: #28a745;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-info {
+    background-color:rgb(25, 100, 126);
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .header-controls {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    .buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+#shop-container{
+    position: relative;
+    
+
+}
+#money {
+    color: yellow;
+    font-weight: bold;
+    text-shadow:
+    -0.5px -0.5px 0 #000,
+     0.5px -0.5px 0 #000,
+    -0.5px  0.5px 0 #000,
+     0.5px  0.5px 0 #000;
+}
+.money-label {
+    color: gold;
+    text-shadow:
+    -0.5px -0.5px 0 #000,
+     0.5px -0.5px 0 #000,
+    -0.5px  0.5px 0 #000,
+     0.5px  0.5px 0 #000;
+}
+#message-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    z-index: 1000;
+    max-width: 400px;
+}
+
+#message-container p {
+    color: white;
+    margin: 0;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.stage-label {
+    color: lightblue;
+    text-shadow:
+    -0.5px -0.5px 0 #000,
+     0.5px -0.5px 0 #000,
+    -0.5px  0.5px 0 #000,
+     0.5px  0.5px 0 #000;
+}
+#stage {
+    color: rgb(144, 238, 225);
+    font-weight: bold;
+    text-shadow:
+    -0.5px -0.5px 0 #000,
+     0.5px -0.5px 0 #000,
+    -0.5px  0.5px 0 #000,
+     0.5px  0.5px 0 #000;
+}
+#goto-home{
+    position: fixed;
+    left: 10px;       
+    top: 10px;        
+    z-index: 1000;    
+    
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+#home-btn:hover {
+    background-color: #0056b3;
+}
+
+

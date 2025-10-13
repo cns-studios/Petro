@@ -167,10 +167,10 @@ function updateUI(state) {
         petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
         petCard.style.cursor = 'pointer';
         petCard.innerHTML = `
-            <div class="name">${pet.name} (Lv. ${pet.level})</div>
+            <img class="src" src="/images/${pet.name}.png"><div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
             <div>Dodge: ${pet.dodge_chance}%</div>
-            <div>Rarity: ${pet.rarity}</div>
+            
         `;
         petCard.addEventListener('click', () => {
                 if (ws && ws.readyState === WebSocket.OPEN) {

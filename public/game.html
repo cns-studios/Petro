@@ -8,16 +8,22 @@
 </head>
 <body>
     <header>
-            <h1>Petro</h1>
+    <div class="header-container">
+        <h1>Petro</h1>
+        <div class="header-controls">
             <div class="stats">
-                <span>Money: <span id="money">0</span></span>
-                <span>Stage: <span id="stage">0</span></span>
+                <span class="money-label">m0oney<span id="money">0</span></span>
+                <span class="stage-label">Stage: <span id="stage">0</span></span>
             </div>
-            <button id="save-btn">Save Game</button>
-            <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
-            <button onclick="Petsell()" style="background-color: #ffc107;">Sell All Pets</button> 
-            <button onclick="Sell_spezific_pet()" style="background-color: #17a2b8;">click on pet you want to sell</button>
-        </header>
+            <div class="buttons">
+                <button id="save-btn">Save</button>
+                <button onclick="logout()" class="btn-danger">Logout</button>
+                <button onclick="Petsell()" class="btn-warning">Sell All</button>
+                <button onclick="Sell_spezific_pet()" class="btn-info">Sell Pet</button>
+            </div>
+        </div>
+    </div>
+    </header>
 
 
         <button id="goto-inv">Go to Inventory</button>
@@ -26,14 +32,29 @@
         <button id="goto-collection">Go to Collection</button>
         <button id="goto-home">Go back to Home</button>
 
+
         <div id="home">
-            <h1>Homepage</h1>
+            <h1>Home</h1>
         </div>
         <div id="inv">
             <h1>Inventory</h1>
+            <div id="inventory-container">
+                <h2>Your Pets</h2>
+                <div id="inventory"></div>
+            </div>
         </div>
         <div id="shop">
             <h1>Shop</h1>
+            <div id="shop-container">
+                
+                <div class="shop-actions">
+                    <button onclick="buy('up')">Buy Upgrade Pack (3$) [<span id="shop-up">0</span>]</button>
+                    <button onclick="buy('bp')">Buy Buff Pack (4$) [<span id="shop-bp">0</span>]</button>
+                    <button onclick="buy('cp')">Buy Character Pack (8$) [<span id="shop-cp">0</span>]</button>
+                    <button onclick="buy('lup')">Buy Legendary Upgrade Pack (10$) [<span id="shop-lup">0</span>]</button>
+                    <button onclick="rerollShop()">Reroll Shop (<span id="reroll-price">5</span>$)</button>
+                </div>
+            </div>
         </div>
         <div id="settings">
             <h1>Settings</h1>
@@ -47,21 +68,9 @@
                 <p id="message"></p>
             </div>
 
-            <div id="inventory-container">
-                <h2>Your Pets</h2>
-                <div id="inventory"></div>
-            </div>
+            
 
-            <div id="shop-container">
-                <h2>Shop</h2>
-                <div class="shop-actions">
-                    <button onclick="buy('up')">Buy Upgrade Pack (3$) [<span id="shop-up">0</span>]</button>
-                    <button onclick="buy('bp')">Buy Buff Pack (4$) [<span id="shop-bp">0</span>]</button>
-                    <button onclick="buy('cp')">Buy Character Pack (8$) [<span id="shop-cp">0</span>]</button>
-                    <button onclick="buy('lup')">Buy Legendary Upgrade Pack (10$) [<span id="shop-lup">0</span>]</button>
-                    <button onclick="rerollShop()">Reroll Shop (<span id="reroll-price">5</span>$)</button>
-                </div>
-            </div>
+            
         </main>
 
         <div id="buff-selection" class="modal-overlay" style="display: none;">
