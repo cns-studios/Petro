@@ -173,8 +173,16 @@ wss.on('connection', (ws, req) => {
             const command = message.toString();
             console.log(`[Client -> Server] (User: ${username}) Received command: ${command}`);
             if (!gameProcess.killed) {
-                if (command == "add_matchmaking_queue")
-                gameProcess.stdin.write(command + '\n');
+                if (command == "add_matchmaking_queue") {
+                    console.log(`[Game] Adding User to matchmaking Process`)
+                    let ingameProcess = ingameInstances.get(username);
+                    if (!ingameProcess || gameProcess.killed) {
+                        console.log(`[Game] No live ingame process for ${username}. Creating new one.`);
+                        ingameProcess = createIngameProcess(username);
+                    }
+                } else {
+                    gameProcess.stdin.write(command + '\n');
+                }
             }
         });
 
@@ -215,3 +223,52 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}. Access at http://localhost:${PORT}`);
 });
+
+
+
+
+// Ingame fight system
+
+const connectionAttemptsIngame = new Map();
+
+const ingameInstances = new Map();
+
+function createIngameProcess(username) {
+    if (connectionAttemptsIngame.has(username)) {
+        console.log(`[Game] Process creation already in progress for ${username}`);
+        return connectionAttemptsIngame.get(username);
+    }
+
+    console.log(`[Game] Spawning new ingame process for user: ${username}`)
+
+    const pythonCommand = process.platform === 'win32' ? 'py' : 'python3';
+    const ingameProcess = spawn(pythonCommand, ['-u', path.join(__dirname, 'src', 'ingame.py'), username]);
+
+    connectionAttemptsIngame.set(username, ingameProcess);
+    ingameInstances.set(username, ingameProcess);
+
+    ingameProcess.on('spawn', () => {
+        console.log(`[Game] Successfully spawned ingame process for ${username} with PID: ${ingameProcess.pid}`);
+        connectionAttemptsIngame.delete(username);
+    });
+
+    ingameProcess.stderr.on('data', (data) => {
+        console.error(`[Game ERROR] (User: ${username}): ${data.toString()}`);
+    });
+
+    ingameProcess.on('close', (code) => {
+        console.log(`[Game] Ingame process for ${username} exited with code ${code}`);
+        ingameInstances.delete(username);
+        connectionAttemptsIngame.delete(username);    
+    });
+
+    ingameProcess.on('error', (err) => {
+        console.error(`[Game] Failed to start ingame process for ${username}:`, err);
+        ingameInstances.delete(username);
+        connectionAttemptsIngame.delete(username);
+    });
+
+    return ingameProcess;
+};
+
+
