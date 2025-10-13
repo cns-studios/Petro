@@ -235,3 +235,90 @@ function selectBuff(index) {
         console.error('WebSocket is not connected');
     }
  }
+
+
+
+
+// Page Navigation
+
+const gotoInvbtn = document.getElementById('goto-inv');
+const gotoShopbtn = document.getElementById('goto-shop');
+const gotoSettingsbtn = document.getElementById('goto-settings');
+const gotoCollectionbtn = document.getElementById('goto-collection');
+const gotoHomebtn = document.getElementById('goto-home');
+
+const homePage = document.getElementById('home');
+const invPage = document.getElementById('inv');
+const shopPage = document.getElementById('shop');
+const settingsPage = document.getElementById('settings');
+const collectionPage = document.getElementById('collection');
+
+gotoHomebtn.style.display = 'none';
+
+invPage.style.display = 'none';
+shopPage.style.display = 'none';
+settingsPage.style.display = 'none';
+collectionPage.style.display = 'none'
+
+gotoHomebtn.addEventListener('click', () => {
+    homePage.style.display = 'block';
+    gotoHomebtn.style.display = 'none';
+
+    gotoCollectionbtn.style.display = 'block';
+    gotoShopbtn.style.display = 'block';
+    gotoSettingsbtn.style.display = 'block';
+    gotoInvbtn.style.display = 'block';
+
+    invPage.style.display = 'none';
+    shopPage.style.display = 'none';
+    settingsPage.style.display = 'none';
+    collectionPage.style.display = 'none';
+});
+
+gotoInvbtn.addEventListener('click', () => {
+    invPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoCollectionbtn.style.display = 'none';
+    gotoShopbtn.style.display = 'none';
+    gotoSettingsbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
+
+gotoShopbtn.addEventListener('click', () => {
+    shopPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoCollectionbtn.style.display = 'none';
+    gotoShopbtn.style.display = 'none';
+    gotoSettingsbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
+
+gotoSettingsbtn.addEventListener('click', () => {
+    settingsPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoCollectionbtn.style.display = 'none';
+    gotoShopbtn.style.display = 'none';
+    gotoSettingsbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
+
+gotoCollectionbtn.addEventListener('click', () => {
+    collectionPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoCollectionbtn.style.display = 'none';
+    gotoShopbtn.style.display = 'none';
+    gotoSettingsbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
