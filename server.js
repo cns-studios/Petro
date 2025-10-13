@@ -201,6 +201,11 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/matchmaking', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'matchmaking.html'));
+    console.log('Matchmaking for user:', req.query.username)
+});
+
 app.use((req, res) => {
     res.status(404).send('File not found');
 });

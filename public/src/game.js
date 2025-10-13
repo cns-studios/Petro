@@ -56,6 +56,7 @@ const shopBpEl = document.getElementById('shop-bp');
 const shopCpEl = document.getElementById('shop-cp');
 const shopLupEl = document.getElementById('shop-lup');
 const rerollPriceEl = document.getElementById('reroll-price');
+const playBtn = document.getElementById('play-btn');
 
 const buffSelectionModal = document.getElementById('buff-selection');
 const buffChoicesEl = document.getElementById('buff-choices');
@@ -143,6 +144,12 @@ document.getElementById('save-btn').addEventListener('click', () => {
     }
 });
 
+
+playBtn.addEventListener('click', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        window.location.href= '/matchmaking';
+    }
+});
 
 function updateUI(state) {
     if (state.money !== undefined) moneyEl.textContent = state.money;
