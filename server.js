@@ -328,20 +328,28 @@ app.use((req, res) => {
     res.status(404).send('File not found');
 });
 
+// Handle WebSocket upgrade - route to appropriate handler
 server.on('upgrade', (request, socket, head) => {
-    const { pathname, query } = url.parse(request.url, true);
+    const pathname = url.parse(request.url).pathname;
+    const { query } = url.parse(request.url, true);
+    
+    console.log(`[WebSocket] Upgrade request for path: ${pathname}`);
     
     if (pathname === '/battle') {
         // Battle ws
         const { battleId, username, pin } = query;
         
+        console.log(`[Battle WS] Upgrade attempt for battle #${battleId} by ${username}`);
+        
         if (!battleId || !username || !pin) {
+            console.log('[Battle WS] Missing parameters, destroying socket');
             socket.destroy();
             return;
         }
         
         db.get('SELECT * FROM users WHERE username = ? AND pin = ?', [username, pin], (err, user) => {
             if (err || !user) {
+                console.log(`[Battle WS] Invalid credentials for ${username}`);
                 socket.destroy();
                 return;
             }
@@ -352,6 +360,14 @@ server.on('upgrade', (request, socket, head) => {
         });
     } else {
         // normal ws for every else shitty json communication (json shit was implemented by me, still ass af)
+        const { username, pin } = query;
+        
+        if (!username || !pin) {
+            console.log('[WebSocket] Missing credentials, destroying socket');
+            socket.destroy();
+            return;
+        }
+        
         wss.handleUpgrade(request, socket, head, (ws) => {
             wss.emit('connection', ws, request);
         });
