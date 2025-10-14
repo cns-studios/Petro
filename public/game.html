@@ -16,28 +16,35 @@
                 </span>
                 
             </div>
-            <div class="buttons">
-                <button id="save-btn">Save</button>
-                <button onclick="logout()" class="btn-danger">Logout</button>
-                
-            </div>
+            
         </div>
         
     </div>
         
     <div class="petro">
         <h1>Petro</h1>
+        <button id="save-btn">Save</button>
+        <button onclick="logout()" class="btn-danger">Logout</button>
         
     </div>
 
     </header>
 
         <div class="page-navigation">
-            <button id="goto-inv">Go to Inventory</button>
-            <button id="goto-shop">Go to Shop</button>
-            <button id="goto-settings">Go to Settings</button>
-            <button id="goto-collection">Go to Collection</button>
-            <button id="goto-home">Go back to Home</button>
+            <button id="goto-inv">
+                <img class="inv-icon" src="/sprites/inv.png" alt="Shop">
+                <span>Inv</span>
+            </button>
+            <button id="goto-shop">
+                <img class="shop-icon" src="/sprites/shop.png" alt="Shop">
+                <span>Shop</span>
+            </button>
+            <button id="goto-home">
+                <img class="home-icon" src="/sprites/back.png" alt="Shop">
+                <span>Home</span>
+            </button>
+            <button id="goto-settings">Settings</button>
+            <button id="goto-collection">Collection</button>
         </div>
 
 
