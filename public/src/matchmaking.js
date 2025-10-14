@@ -37,48 +37,63 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function connectWebSocket(username, pin) {
-    console.log('Attempting to connect with:', { username, pin }); // DEBUG
+    console.log('Connecting to matchmaking...', { username, pin });
     
     ws = new WebSocket(`ws://${window.location.host}?username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
 
     ws.onopen = () => {
-        console.log('Connected to the server.');        
-        stateRequestTimeout = setTimeout(() => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                console.log('Requesting matchmaking queue...');
-
-            }
-        }, 100);
+        console.log('Connected to server. Joining matchmaking...');
+        ws.send('join_matchmaking');
     };
 
     ws.onmessage = (event) => {
-        const gameState = JSON.parse(event.data);
-        updateUI(gameState);
+        try {
+            const data = JSON.parse(event.data);
+            console.log('Received:', data);
+            
+            if (data.type === 'searching') {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h1>Searching for opponent...</h1>
+                        <p>Queue position: ${data.queuePosition}</p>
+                        <div class="spinner"></div>
+                        <button onclick="leaveQueue()">Cancel</button>
+                    </div>
+                `;
+            } else if (data.type === 'match_found') {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h1>Match Found!</h1>
+                        <p>Opponent: ${data.opponent}</p>
+                        <p>Starting battle...</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    window.location.href = `/battle?battleId=${data.battleId}&username=${username}&pin=${pin}`;
+                }, 2000);
+            } else if (data.type === 'left_queue') {
+                window.location.href = '/game';
+            }
+        } catch (e) {
+            console.error('Failed to parse message:', e);
+        }
     };
 
-    ws.onclose = (event) => {
-        console.log('Disconnected from the server.', event.reason);
-        console.log('Event code:', event.code, 'Was clean:', event.wasClean); // DEBUG
-        
-        if (stateRequestTimeout) {
-            clearTimeout(stateRequestTimeout);
-            stateRequestTimeout = null;
-        }
-        
-        if (!event.wasClean || event.code === 1008) {
-            setTimeout(() => {
-                deleteCookie('username');
-                deleteCookie('pin');
-                window.location.href = '/login';
-            }, 2000);
-        }
+    ws.onclose = () => {
+        console.log('Disconnected from matchmaking');
     };
 
     ws.onerror = (error) => {
         console.error('WebSocket error:', error);
     };
-};
+}
 
+function leaveQueue() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('leave_matchmaking');
+    }
+}
 function updateUI(state) {
 
 };
