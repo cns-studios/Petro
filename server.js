@@ -10,7 +10,10 @@ const fs = require('fs')
 const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+// Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
+const wss = new WebSocket.Server({ noServer: true });
+const wss_battle = new WebSocket.Server({ noServer: true });
 
 const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) => {
     if (err) {
@@ -359,51 +362,6 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}. Access at http://localhost:${PORT}`);
 });
-
-
-// Ingame fight system
-
-const connectionAttemptsIngame = new Map();
-
-const ingameInstances = new Map();
-
-function createIngameProcess(username) {
-    if (connectionAttemptsIngame.has(username)) {
-        console.log(`[Game] Process creation already in progress for ${username}`);
-        return connectionAttemptsIngame.get(username);
-    }
-
-    console.log(`[Game] Spawning new ingame process for user: ${username}`)
-
-    const pythonCommand = process.platform === 'win32' ? 'py' : 'python3';
-    const ingameProcess = spawn(pythonCommand, ['-u', path.join(__dirname, 'src', 'ingame.py'), username]);
-
-    connectionAttemptsIngame.set(username, ingameProcess);
-    ingameInstances.set(username, ingameProcess);
-
-    ingameProcess.on('spawn', () => {
-        console.log(`[Game] Successfully spawned ingame process for ${username} with PID: ${ingameProcess.pid}`);
-        connectionAttemptsIngame.delete(username);
-    });
-
-    ingameProcess.stderr.on('data', (data) => {
-        console.error(`[Game ERROR] (User: ${username}): ${data.toString()}`);
-    });
-
-    ingameProcess.on('close', (code) => {
-        console.log(`[Game] Ingame process for ${username} exited with code ${code}`);
-        ingameInstances.delete(username);
-        connectionAttemptsIngame.delete(username);    
-    });
-
-    ingameProcess.on('error', (err) => {
-        console.error(`[Game] Failed to start ingame process for ${username}:`, err);
-        ingameInstances.delete(username);
-        connectionAttemptsIngame.delete(username);
-    });
-
-    return ingameProcess;
-};
 
 
 // Matchmaking and the queue shit
