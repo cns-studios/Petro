@@ -2,7 +2,7 @@
 
 body {
     font-family: sans-serif;
-    background-color: #f0f0f0;
+    background-color: #c3b9a2;
     color: #333;
     display: flex;
     justify-content: center;
@@ -42,6 +42,7 @@ body {
 
 #header h1 {
     margin: 0;
+
 }
 
 #stats span {
@@ -76,7 +77,7 @@ body {
     cursor: pointer;
 }
 .pet-card img {
-    width: 100px;   /* Bildgröße reduziert */
+    width: 100px;   
     height: 100px;
     object-fit: contain;
     display: block;
@@ -235,7 +236,7 @@ button:hover {
 header h1 {
     margin: 0;
     color: transparent;
-    font-size: 2rem;
+    font-size: 70px;
     font-weight: bold;
     font-family: 'Pixelify Sans';
     background-image: linear-gradient(to bottom, red, yellow);
@@ -249,11 +250,17 @@ header h1 {
 }
 
 .stats {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
     display: flex;
     gap: 1.5rem;
     color: white;
     font-weight: 500;
+    z-index: 1000;
+    size: 300px;
 }
+
 
 .buttons {
     display: flex;
@@ -276,10 +283,16 @@ header button:hover {
 
 #save-btn {
     background-color: #28a745;
+    left: 10px;
+    top: 10px;
+    position: fixed;
 }
 
 .btn-danger {
     background-color: #dc3545;
+    left: 82px;
+    top: 10px;
+    position: fixed;
 }
 
 .btn-warning {
@@ -316,19 +329,17 @@ header button:hover {
 #money {
     color: yellow;
     font-weight: bold;
-    text-shadow:
-    -0.5px -0.5px 0 #000,
-     0.5px -0.5px 0 #000,
-    -0.5px  0.5px 0 #000,
-     0.5px  0.5px 0 #000;
+    font-size: 3rem; 
+    
 }
+
 .money-label {
     color: gold;
-    text-shadow:
-    -0.5px -0.5px 0 #000,
-     0.5px -0.5px 0 #000,
-    -0.5px  0.5px 0 #000,
-     0.5px  0.5px 0 #000;
+    font-size: 3rem;
+    
+}
+.money-symbol {
+    font-family: 'Pixelify Sans', sans-serif;
 }
 #message-container {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -347,29 +358,22 @@ header button:hover {
     color: white;
     margin: 0;
     font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    
 }
 
 .stage-label {
     color: lightblue;
-    text-shadow:
-    -0.5px -0.5px 0 #000,
-     0.5px -0.5px 0 #000,
-    -0.5px  0.5px 0 #000,
-     0.5px  0.5px 0 #000;
+    
 }
 #stage {
     color: rgb(144, 238, 225);
     font-weight: bold;
-    text-shadow:
-    -0.5px -0.5px 0 #000,
-     0.5px -0.5px 0 #000,
-    -0.5px  0.5px 0 #000,
-     0.5px  0.5px 0 #000;
+    
+    
 }
 #goto-home{
     position: fixed;
-    left: 10px;       
+    left: 11px;       
     top: 10px;        
     z-index: 1000;    
     
@@ -385,4 +389,22 @@ header button:hover {
     background-color: #0056b3;
 }
 
+.page-navigation {
+    display: flex;
+    gap: 0.5rem; 
+}
+.petro {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 1000;
+    
+    width: 100%;
+    padding: 20px 0;
+     
+}
 

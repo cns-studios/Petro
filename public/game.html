@@ -9,35 +9,49 @@
 <body>
     <header>
     <div class="header-container">
-        <h1>Petro</h1>
         <div class="header-controls">
             <div class="stats">
-                <span class="money-label">m0oney<span id="money">0</span></span>
-                <span class="stage-label">Stage: <span id="stage">0</span></span>
+                <span class="money-label">
+                    <span class="money-symbol">$</span><span id="money">0</span>
+                </span>
+                
             </div>
             <div class="buttons">
                 <button id="save-btn">Save</button>
                 <button onclick="logout()" class="btn-danger">Logout</button>
-                <button onclick="Petsell()" class="btn-warning">Sell All</button>
-                <button onclick="Sell_spezific_pet()" class="btn-info">Sell Pet</button>
+                
             </div>
         </div>
+        
     </div>
+        
+    <div class="petro">
+        <h1>Petro</h1>
+        
+    </div>
+
     </header>
 
+        <div class="page-navigation">
+            <button id="goto-inv">Go to Inventory</button>
+            <button id="goto-shop">Go to Shop</button>
+            <button id="goto-settings">Go to Settings</button>
+            <button id="goto-collection">Go to Collection</button>
+            <button id="goto-home">Go back to Home</button>
+        </div>
 
-        <button id="goto-inv">Go to Inventory</button>
-        <button id="goto-shop">Go to Shop</button>
-        <button id="goto-settings">Go to Settings</button>
-        <button id="goto-collection">Go to Collection</button>
-        <button id="goto-home">Go back to Home</button>
 
 
         <div id="home">
-            <h1>Home</h1>
         </div>
+
+
+
+
         <div id="inv">
             <h1>Inventory</h1>
+            <button onclick="Petsell()" class="btn-warning">Sell All</button>
+            <button onclick="Sell_spezific_pet()" class="btn-info">Sell Pet</button>
             <div id="inventory-container">
                 <h2>Your Pets</h2>
                 <div id="inventory"></div>
@@ -79,6 +93,11 @@
                 <div id="buff-choices"></div>
             </div>
         </div>
+
+        
+        
+
+
 <script src="/src/game.js"></script>
 </body>
 </html>

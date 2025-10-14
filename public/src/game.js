@@ -1,5 +1,6 @@
 let ws;
 let stateRequestTimeout = null;
+let sellMode = false;
 
 // Cookie and auth functions
 function logout() {
@@ -143,13 +144,35 @@ document.getElementById('save-btn').addEventListener('click', () => {
     }
 });
 
+function Sell_spezific_pet() {
+    sellMode = !sellMode;
+    const button = event.target;
+    
+    if (sellMode) {
+        button.textContent = 'Cancel';
+        button.classList.remove('btn-info');
+        button.classList.add('btn-danger');
+        messageEl.textContent = 'Click on a pet to sell it';
+    } else {
+        button.textContent = 'Sell Pet';
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-info');
+        messageEl.textContent = '';
+    }
+}
+
+
 
 function updateUI(state) {
     if (state.money !== undefined) moneyEl.textContent = state.money;
-    if (state.stage !== undefined) stageEl.textContent = state.stage;
+    
     
     if (state.message) {
         messageEl.textContent = state.message;
+
+
+
+
         if (state.message !== 'Choose a buff.' && !state.message.includes('Welcome')) {
             setTimeout(() => {
                 if (messageEl.textContent === state.message) {
@@ -170,17 +193,20 @@ function updateUI(state) {
             <img class="src" src="/images/${pet.name}.png"><div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
             <div>Dodge: ${pet.dodge_chance}%</div>
-            
         `;
+        
         petCard.addEventListener('click', () => {
+            
+            if (sellMode) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(`spezific_pet_sell ${pet.name}`);
                 } else {
                     messageEl.textContent = 'Connection lost. Please refresh the page.';
                     console.error('WebSocket is not connected');
-    }
                 }
-        );
+            }
+        });
+        
         inventoryEl.appendChild(petCard);
     });
     }
