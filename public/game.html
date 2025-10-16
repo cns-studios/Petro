@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="background-container">
+        <canvas id="balatroCanvas"></canvas>
+    </div>
+
+    <div id="message-container">
+        <p id="message"></p>
+    </div>
+
     <header>
     <div class="header-container">
         <div class="header-controls">
@@ -20,15 +28,21 @@
         </div>
         
     </div>
-        
+    
+
     <div class="petro">
         <h1>Petro</h1>
         <button id="save-btn">Save</button>
         <button onclick="logout()" class="btn-danger">Logout</button>
+        <button id="goto-settings">
+            <img class="settings-icon" src="/sprites/settings.png" alt="Shop">
+            <span>Settings</span>
+        </button>
         
     </div>
 
     </header>
+        
 
         <div class="page-navigation">
             <button id="goto-inv">
@@ -43,10 +57,10 @@
                 <img class="home-icon" src="/sprites/back.png" alt="Shop">
                 <span>Home</span>
             </button>
-            <button id="goto-settings">Settings</button>
+            
+
             <button id="goto-collection">Collection</button>
         </div>
-
 
 
         <div id="home">
@@ -57,23 +71,44 @@
 
         <div id="inv">
             <h1>Inventory</h1>
-            <button onclick="Petsell()" class="btn-warning">Sell All</button>
-            <button onclick="Sell_spezific_pet()" class="btn-info">Sell Pet</button>
+            <div class="inv-buttons">
+                <button onclick="Petsell()" class="btn-warning">Sell All</button>
+                <button id="sell-pet-btn" onclick="Sell_spezific_pet(event)" class="btn-info">Sell Pet</button>
+            </div>
             <div id="inventory-container">
-                <h2>Your Pets</h2>
+                
                 <div id="inventory"></div>
             </div>
         </div>
+
         <div id="shop">
             <h1>Shop</h1>
             <div id="shop-container">
-                
                 <div class="shop-actions">
-                    <button onclick="buy('up')">Buy Upgrade Pack (3$) [<span id="shop-up">0</span>]</button>
-                    <button onclick="buy('bp')">Buy Buff Pack (4$) [<span id="shop-bp">0</span>]</button>
-                    <button onclick="buy('cp')">Buy Character Pack (8$) [<span id="shop-cp">0</span>]</button>
-                    <button onclick="buy('lup')">Buy Legendary Upgrade Pack (10$) [<span id="shop-lup">0</span>]</button>
-                    <button onclick="rerollShop()">Reroll Shop (<span id="reroll-price">5</span>$)</button>
+                    <button class="shop-btn" onclick="buy('up')">
+                        <span class="shop-btn-text">Buy Upgrade Pack</span>
+                        <span class="shop-btn-price">3$</span>
+                        <span class="shop-btn-stock">[<span id="shop-up">0</span>]</span>
+                    </button>
+                    <button class="shop-btn" onclick="buy('bp')">
+                        <span class="shop-btn-text">Buy Buff Pack</span>
+                        <span class="shop-btn-price">4$</span>
+                        <span class="shop-btn-stock">[<span id="shop-bp">0</span>]</span>
+                    </button>
+                    <button class="shop-btn" onclick="buy('cp')">
+                        <span class="shop-btn-text">Buy Character Pack</span>
+                        <span class="shop-btn-price">8$</span>
+                        <span class="shop-btn-stock">[<span id="shop-cp">0</span>]</span>
+                    </button>
+                    <button class="shop-btn legendary" onclick="buy('lup')">
+                        <span class="shop-btn-text">Buy Legendary Upgrade Pack</span>
+                        <span class="shop-btn-price">10$</span>
+                        <span class="shop-btn-stock">[<span id="shop-lup">0</span>]</span>
+                    </button>
+                    <button class="shop-btn reroll" onclick="rerollShop()">
+                        <span class="shop-btn-text">Reroll Shop</span>
+                        <span class="shop-btn-price"><span id="reroll-price">5</span>$</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -88,6 +123,9 @@
             <div id="message-container">
                 <p id="message"></p>
             </div>
+            
+
+            
 
             
 

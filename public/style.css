@@ -1,18 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 
 body {
-    font-family: sans-serif;
-    background-image: url('/sprites/petro_main.png');
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    width: auto;
-    height: auto;
-    background-size: cover;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0e27;
+    font-family: sans-serif;
 }
+
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+    padding: 50px;
+}
+
 #home {
     position:fixed;
     text-align: center;
@@ -63,11 +84,73 @@ body {
     margin-top: 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+#inv {
+    padding: 20px;
+    max-width: 1500px;
+    margin: 80px auto 0;
+}
+
+#inv h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.inv-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#inventory-container {
+    margin-top: 20px;
+    position: relative;
+}
+
+#inventory-container h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
 #inventory {
     display: flex;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    flex-wrap: wrap;
     gap: 10px;
+    max-height: 75vh;
+    overflow-y: scroll;
+    padding: 10px 0 10px 10px;
+    direction: ltr;
 }
+
+#inventory::-webkit-scrollbar {
+    width: 8px;
+}
+
+#inventory::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+    margin-right: 0;
+}
+
+#inventory::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#inventory::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 
 
 
@@ -111,7 +194,7 @@ body {
 .pet-card.rarity-rare:hover {
     background-color: #003a5f;
     border-color: #000d58;
-    font-weight: bold;
+    
 }
 
 .pet-card.rarity-legendary {
@@ -120,13 +203,159 @@ body {
 }
 
 .pet-card.rarity-legendary:hover {
+
     background-color: #b59702;
     border-color: #876700;
     
 }
-.shop-item {
-    margin-bottom: 10px;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Shop  */
+#shop {
+    padding: 20px;
+    max-width: 800px;
+    margin: 80px auto 0;
 }
+
+#shop h1 {
+    text-align: center;
+    color: rgb(34, 10, 15);
+    margin-bottom: 30px;
+    font-size: 3.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#shop-container {
+    background: linear-gradient(135deg, rgb(25, 100, 126) 0%, rgb(88, 38, 48) 100%);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.shop-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.shop-btn {
+    background: rgb(25, 100, 126);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.shop-btn:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background: rgb(35, 120, 146);
+    border: 2px solid rgb(227, 149, 61);
+}
+
+.shop-btn:active {
+    transform: scale(0.98);
+}
+
+.shop-btn.character {
+    background: linear-gradient(135deg, rgb(25, 100, 126) 0%, rgb(88, 38, 48) 50%);
+    border: 2px solid rgb(227, 149, 61);
+}
+
+.shop-btn.character:hover {
+    background: linear-gradient(135deg, rgb(88, 38, 48) 0%, rgb(25, 100, 126) 50%);
+    box-shadow: 0 6px 12px rgba(227, 149, 61, 0.3);
+}
+
+.shop-btn.legendary {
+    background: linear-gradient(135deg, rgb(219, 80, 74) 0%, rgb(88, 38, 48) 100%);
+    color: white;
+    border: 2px solid rgb(227, 149, 61);
+}
+
+.shop-btn.legendary:hover {
+    background: linear-gradient(135deg, rgb(88, 38, 48) 0%, rgb(219, 80, 74) 100%);
+    box-shadow: 0 6px 12px rgba(227, 149, 61, 0.4);
+}
+
+.shop-btn.reroll {
+    background: linear-gradient(135deg, rgb(46, 125, 50) 0%, rgb(27, 94, 32) 100%);
+    color: white;
+    margin-top: 10px;
+    border: 2px solid rgb(129, 199, 132);
+}
+
+.shop-btn.reroll:hover {
+    background: linear-gradient(135deg, rgb(27, 94, 32) 0%, rgb(46, 125, 50) 100%);
+    box-shadow: 0 6px 12px rgba(129, 199, 132, 0.5);
+}
+
+.shop-btn-text {
+    flex: 1;
+    text-align: left;
+}
+
+.shop-btn-price {
+    color: rgb(227, 149, 61);
+    font-weight: bold;
+    margin: 0 15px;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.shop-btn-stock {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .shop-btn {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .shop-btn-text {
+        text-align: center;
+    }
+    
+    .shop-btn-stock {
+        text-align: center;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 button {
     padding: 8px 12px;
@@ -293,22 +522,29 @@ header button:hover {
     cursor: pointer;
 }
 
-.btn-danger {
-    background-color: #dc3545;
+header .btn-danger {
+    position: fixed;
     left: 82px;
     top: 10px;
-    position: fixed;
-    cursor: pointer;
-    z-index: 9999; 
+    z-index: 9999;
 }
 
 .btn-warning {
     background-color: #ffc107;
     color: #333;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .btn-info {
-    background-color:rgb(25, 100, 126);
+    background-color: rgb(25, 100, 126);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
 }
 
 @media (max-width: 768px) {
@@ -328,20 +564,20 @@ header button:hover {
         justify-content: center;
     }
 }
-#shop-container{
-    position: relative;
-    
 
-}
 #money {
-    color: yellow;
+    color: hwb(51 0% 0%);
     font-weight: bold;
     font-size: 3rem; 
     
 }
 
+#money:hover {
+    transform: translateY(-2px); 
+}
+
 .money-label {
-    color: gold;
+    color: hwb(51 0% 0%);
     font-size: 3rem;
     
 }
@@ -349,23 +585,53 @@ header button:hover {
     font-family: 'Pixelify Sans', sans-serif;
 }
 #message-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: transparent;
+    border-radius: 16px;
+    padding: 2rem 3rem;
+    box-shadow: none;
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    border: none;
     z-index: 1000;
-    max-width: 400px;
+    max-width: 500px;
+    min-width: 300px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes messagePopup {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
 }
 
 #message-container p {
     color: white;
     margin: 0;
-    font-weight: 500;
-    
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5),
+                 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .stage-label {
@@ -481,7 +747,7 @@ header button:hover {
     cursor: pointer;
     position: fixed;
     left: 0;
-    top: 30px;
+    top: 60px;
 }
 
 #goto-home:hover {
@@ -489,7 +755,45 @@ header button:hover {
 }
 
 #goto-home img.home-icon {
-    width: 200px;
+    width: 130px;
     height: auto;
     display: block;
+}
+
+#goto-settings {
+    width: auto; 
+    height: auto; 
+    display: inline-block;
+    border: none;
+    background: none; 
+    color: transparent;
+    padding: 0; 
+    margin: 0;
+    box-shadow: none; 
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: fixed;
+    left: 170px;
+    top: 8px;
+}
+
+#goto-settings:hover {
+    transform: translateY(-2px); 
+}
+
+#goto-settings img.settings-icon {
+    width: 40px;
+    height: auto;
+    display: block;
+    
+}
+
+#goto-collection {
+    position: fixed;
+    
+    left: 100px;
+    bottom: 0;
 }
