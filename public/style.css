@@ -824,6 +824,8 @@ header .btn-danger {
 
 #goto-collection {
     position: fixed;
+    background-color: transparent;
+    color: transparent;
     
     left: 100px;
     bottom: 0;
