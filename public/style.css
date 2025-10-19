@@ -209,6 +209,37 @@ canvas {
     
 }
 
+.pet-card.rarity-chroma {
+    background: linear-gradient(
+        45deg,
+        #ff0000 0%,
+        #ff0000 14%,
+        #ff6200 100%
+    );
+    background-size: 300% 300%;
+    border-color: #ffffff;
+    animation: rainbow-wave 3s ease infinite;
+    box-shadow: 0 0 20px rgba(255, 2, 2, 0.201);
+}
+
+.pet-card.rarity-chroma:hover {
+    background-size: 350% 350%;
+    animation: rainbow-wave 2s ease infinite;
+    box-shadow: 0 0 30px rgba(240, 64, 0, 0.515);
+}
+
+@keyframes rainbow-wave {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 
 
 
@@ -747,7 +778,7 @@ header .btn-danger {
     cursor: pointer;
     position: fixed;
     left: 0;
-    top: 60px;
+    top: 100px;
 }
 
 #goto-home:hover {
@@ -796,4 +827,26 @@ header .btn-danger {
     
     left: 100px;
     bottom: 0;
+}
+
+
+
+
+#user-display {
+    position: fixed;
+    left: 9px;
+    top: 50px; /* direkt unter Save-Button */
+    background-color: #2c5f7c;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 2px solid #1a3a4a;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 9999;
+}
+
+#user-display #username {
+    color: #1eff00eb; /* goldene Farbe für den Username */
 }

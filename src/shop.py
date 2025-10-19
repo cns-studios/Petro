@@ -4,7 +4,7 @@ import random
 import sqlite3
 import os
 import copy
-from assets.pets import all_pet_stats as global_pet_stats, common_pets as global_common_pets, rare_pets as global_rare_pets, legendary_pets as global_legendary_pets, pet_levels as global_pet_levels, all_pets
+from assets.pets import all_pet_stats as global_pet_stats, common_pets as global_common_pets, prehistoric_pets as global_prehistoric_pets, rare_pets as global_rare_pets, legendary_pets as global_legendary_pets, pet_levels as global_pet_levels, all_pets
 from logic import pull_state, push_state
 class Game:
     def __init__(self, username):
@@ -15,6 +15,7 @@ class Game:
         self.available_common_pets = global_common_pets.copy()
         self.available_rare_pets = global_rare_pets.copy()
         self.available_legendary_pets = global_legendary_pets.copy()
+        self.available_prehistoric_pets = global_prehistoric_pets.copy()
         
         state = pull_state(username)
         
@@ -36,6 +37,7 @@ class Game:
                 self.available_common_pets = available_pets.get('common', global_common_pets.copy())
                 self.available_rare_pets = available_pets.get('rare', global_rare_pets.copy())
                 self.available_legendary_pets = available_pets.get('legendary', global_legendary_pets.copy())
+                self.available_prehistoric_pets = available_pets.get('prehistoric', global_prehistoric_pets.copy())
             
             self.pet_levels = state.get('pet_levels', {})
             
@@ -72,7 +74,7 @@ class Game:
         else:
             self.money = 50000
             self.stage = 1
-            self.inventory = ["Worm"]
+            self.inventory = ["T-Rex"]
             self.shop_refresh_price = 5
             self.upgrade_pack = 0
             self.legendary_upgrade_pack = 0
@@ -80,9 +82,10 @@ class Game:
             self.buff_pack = 0
             self.pending_buff_choices = []
             
-            self.pet_levels["Worm"] = 1
-            if "Worm" in self.available_common_pets:
-                self.available_common_pets.remove("Worm")
+            self.pet_levels["T-Rex"] = 1
+            if "T-Rex" in self.available_prehistoric_pets:
+                self.available_prehistoric_pets.remove("T-Rex")
+    
             
             self.reroll_shop()
             push_state(self.username, self)
@@ -308,33 +311,38 @@ class Game:
                 if self.charakter_pack > 0 and self.money >= 8:
                     self.money -= 8
                     self.charakter_pack -= 1
-                    c_r_l = random.randint(0, 100)
-                    new_pet, pet_type = (None, None)
                     
-                    if c_r_l > 90 and self.available_rare_pets: 
-                        new_pet = random.choice(self.available_rare_pets)
-                        pet_type = "rare"
-                    elif c_r_l < 5 and self.available_legendary_pets: 
+                    
+                    roll = random.random()  
+                    
+                    if roll < 0.01 and self.available_prehistoric_pets:  # 1% Chroma
+                        new_pet = random.choice(self.available_prehistoric_pets)
+                        self.available_prehistoric_pets.remove(new_pet)
+                        pet_type = "chroma"
+                    elif roll < 0.06 and self.available_legendary_pets:  # 5% Legendary 
                         new_pet = random.choice(self.available_legendary_pets)
+                        self.available_legendary_pets.remove(new_pet)
                         pet_type = "legendary"
-                    elif self.available_common_pets: 
+                    elif roll < 0.26 and self.available_rare_pets:  # 20% Rare 
+                        new_pet = random.choice(self.available_rare_pets)
+                        self.available_rare_pets.remove(new_pet)
+                        pet_type = "rare"
+                    elif self.available_common_pets:  # 74% Common (Rest)
                         new_pet = random.choice(self.available_common_pets)
+                        self.available_common_pets.remove(new_pet)
                         pet_type = "common"
+                    else:
+                        new_pet = None
                     
                     if new_pet:
                         self.inventory.append(new_pet)
                         self.pet_levels[new_pet] = 1
-                        if pet_type == "rare": 
-                            self.available_rare_pets.remove(new_pet)
-                        elif pet_type == "legendary": 
-                            self.available_legendary_pets.remove(new_pet)
-                        elif pet_type == "common": 
-                            self.available_common_pets.remove(new_pet)
-                        message = f"You got a {pet_type} {new_pet}."
-                    else: 
+                        message = f"You got a {pet_type} {new_pet}!"
+                    else:
                         message = "No new pets available."
-                else: 
+                else:
                     message = "Cannot buy Character Pack."
+                    
             elif item == "lup":
                 if self.legendary_upgrade_pack > 0 and self.money >= 10:
                     self.money -= 10

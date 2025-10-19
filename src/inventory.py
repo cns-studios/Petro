@@ -40,6 +40,9 @@ def process_command(self, command):
                         self.available_rare_pets.append(pet)
                     elif rarity == 3 and pet not in self.available_legendary_pets:
                         self.available_legendary_pets.append(pet)
+                    elif rarity == 10 and pet not in self.available_prehistoric_pets:  # <- DIESE ZEILE FEHLT!
+                        self.available_prehistoric_pets.append(pet)
+                        
                 self.money += total_sell_value
                 self.inventory.remove(pet)  # Entferne das Pet aus dem Inventar
                 message = f"Sold {num_sold_pets} pets for {total_sell_value} money."

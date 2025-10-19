@@ -43,6 +43,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!username || !pin) {
         window.location.href = '/login';
     } else {
+        // Display username
+        const usernameEl = document.getElementById('username');
+        if (usernameEl) {
+            usernameEl.textContent = username;
+        }
         connectWebSocket(username, pin);
     }
 });
@@ -191,7 +196,7 @@ function updateUI(state) {
     state.inventory.forEach(pet => {
         const petCard = document.createElement('div');
         petCard.className = 'pet-card';
-        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
+        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : pet.rarity === 3 ? 'legendary' : 'chroma'}`);
         petCard.style.cursor = 'pointer';
         petCard.innerHTML = `
             <img class="src" src="/images/${pet.name}.png"><div class="name">${pet.name} (Lv. ${pet.level})</div>
@@ -313,7 +318,6 @@ gotoInvbtn.addEventListener('click', () => {
 
     gotoCollectionbtn.style.display = 'none';
     gotoShopbtn.style.display = 'none';
-    gotoSettingsbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
 });
 
@@ -325,7 +329,6 @@ gotoShopbtn.addEventListener('click', () => {
 
     gotoCollectionbtn.style.display = 'none';
     gotoShopbtn.style.display = 'none';
-    gotoSettingsbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
 });
 
