@@ -1,6 +1,7 @@
-on: [merge_group]
+on: [push]
 jobs:
  deploy:
    runs-on: [ubuntu-latest]
    steps:
-     - run: npm start server.js
+     - run: curl --request POST --url http://localhost:3000/update --header 'Content-Type: application/json' --data '{"pass": "adfs"}'
+    
