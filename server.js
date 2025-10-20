@@ -10,7 +10,10 @@ const fs = require('fs')
 const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+// Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
+const wss = new WebSocket.Server({ noServer: true });
+const wss_battle = new WebSocket.Server({ noServer: true });
 
 const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) => {
     if (err) {
@@ -117,6 +120,75 @@ app.post('/login', (req, res) => {
 });
 
 wss.on('connection', (ws, req) => {
+
+    // Battle ws Server
+    const wss_battle = new WebSocket.Server({ noServer: true });
+
+    wss_battle.on('connection', (ws, req, battleId, username) => {
+        console.log(`[Battle WS] Player ${username} connected to battle #${battleId}`);
+
+        const battle = activeBattles.get(parseInt(battleId));
+        if (!battle) {
+            console.log(`[Battle WS] Battle #${battleId} not found`);
+            ws.close(1008, 'Battle not found');
+            return;
+        }
+
+        const battleProcess = battle.process;
+
+        const onData = (data) => {
+            const output = data.toString();
+            output.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                try {
+                    const parsed = JSON.parse(line);
+                    // Send updates to the specific player or broadcast to both
+                    if (ws.readyState === WebSocket.OPEN) {
+                        console.log(`[Battle -> Client] Battle #${battleId}: ${line.trim()}`);
+                        ws.send(line);
+                    }
+                } catch (e) {
+                    console.error(`[Battle] Failed to parse output: ${line}`);
+                }
+            });
+        };
+
+        const onProcessClose = (code) => {
+            console.log(`[Battle WS] Battle #${battleId} process closed`);
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'battle_ended', message: 'Battle ended' }));
+                ws.close(1000, 'Battle ended');
+            }
+            cleanup();
+        };
+
+        const cleanup = () => {
+            battleProcess.stdout.removeListener('data', onData);
+            battleProcess.removeListener('close', onProcessClose);
+        };
+
+        battleProcess.stdout.on('data', onData);
+        battleProcess.once('close', onProcessClose);
+
+        ws.on('message', (message) => {
+            const command = message.toString();
+            console.log(`[Battle Client -> Server] ${username} in battle #${battleId}: ${command}`);
+            if (!battleProcess.killed) {
+                battleProcess.stdin.write(`${username}:${command}\n`);
+            }
+        });
+
+        ws.on('close', () => {
+            console.log(`[Battle WS] ${username} disconnected from battle #${battleId}`);
+            cleanup();
+        });
+
+        ws.on('error', (error) => {
+            console.error(`[Battle WS] Error for ${username} in battle #${battleId}:`, error);
+            cleanup();
+        });
+    });
+
+    
     const { query } = url.parse(req.url, true);
     const { username, pin } = query;
 
@@ -172,7 +244,49 @@ wss.on('connection', (ws, req) => {
         ws.on('message', (message) => {
             const command = message.toString();
             console.log(`[Client -> Server] (User: ${username}) Received command: ${command}`);
-            if (!gameProcess.killed) {
+            
+            if (command === "join_matchmaking") {
+                console.log(`[Matchmaking] ${username} joining matchmaking`);
+                
+                const matchResult = findMatch(username);
+                
+                if (matchResult.matched) {
+                    // Create battle process
+                    const battleProcess = createBattleProcess(
+                        matchResult.battleId, 
+                        username, 
+                        matchResult.opponent
+                    );
+                    
+                    ws.send(JSON.stringify({
+                        type: 'match_found',
+                        battleId: matchResult.battleId,
+                        opponent: matchResult.opponent
+                    }));
+                } else {
+                    // Add ws reference to queue
+                    const queueEntry = matchmakingQueue.find(p => p.username === username);
+                    if (queueEntry) {
+                        queueEntry.ws = ws;
+                    }
+                    
+                    ws.send(JSON.stringify({
+                        type: 'searching',
+                        message: 'Searching for opponent...',
+                        queuePosition: matchmakingQueue.length
+                    }));
+                }
+            } else if (command === "leave_matchmaking") {
+                const index = matchmakingQueue.findIndex(p => p.username === username);
+                if (index !== -1) {
+                    matchmakingQueue.splice(index, 1);
+                    console.log(`[Matchmaking] ${username} left queue`);
+                    ws.send(JSON.stringify({
+                        type: 'left_queue',
+                        message: 'Left matchmaking queue'
+                    }));
+                }
+            } else if (!gameProcess.killed) {
                 gameProcess.stdin.write(command + '\n');
             }
         });
@@ -201,11 +315,148 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/matchmaking', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'matchmaking.html'));
+    console.log(`[Server] New Matchmaking attempt`)
+});
+
+app.get('/battle', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'battle.html'));
+});
+
 app.use((req, res) => {
     res.status(404).send('File not found');
+});
+
+// Handle WebSocket upgrade - route to appropriate handler
+server.on('upgrade', (request, socket, head) => {
+    const pathname = url.parse(request.url).pathname;
+    const { query } = url.parse(request.url, true);
+    
+    console.log(`[WebSocket] Upgrade request for path: ${pathname}`);
+    
+    if (pathname === '/battle') {
+        // Battle ws
+        const { battleId, username, pin } = query;
+        
+        console.log(`[Battle WS] Upgrade attempt for battle #${battleId} by ${username}`);
+        
+        if (!battleId || !username || !pin) {
+            console.log('[Battle WS] Missing parameters, destroying socket');
+            socket.destroy();
+            return;
+        }
+        
+        db.get('SELECT * FROM users WHERE username = ? AND pin = ?', [username, pin], (err, user) => {
+            if (err || !user) {
+                console.log(`[Battle WS] Invalid credentials for ${username}`);
+                socket.destroy();
+                return;
+            }
+            
+            wss_battle.handleUpgrade(request, socket, head, (ws) => {
+                wss_battle.emit('connection', ws, request, battleId, username);
+            });
+        });
+    } else {
+        // normal ws for every else shitty json communication (json shit was implemented by me, still ass af)
+        const { username, pin } = query;
+        
+        if (!username || !pin) {
+            console.log('[WebSocket] Missing credentials, destroying socket');
+            socket.destroy();
+            return;
+        }
+        
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}. Access at http://localhost:${PORT}`);
 });
+
+
+// Matchmaking and the queue shit
+const matchmakingQueue = [];
+const activeBattles = new Map(); // FORMAType shii: battleId -> {player1, player2, process}
+let battleIdCounter = 0;
+
+function findMatch(username) {
+    // Remove player from queue if already there  --> GETOUTTTTT
+    const existingIndex = matchmakingQueue.findIndex(p => p.username === username);
+    if (existingIndex !== -1) {
+        matchmakingQueue.splice(existingIndex, 1);
+    }
+    
+    if (matchmakingQueue.length > 0) {
+        // Match found:
+        const opponent = matchmakingQueue.shift();
+        const battleId = ++battleIdCounter;
+        
+        console.log(`[Matchmaking] Match found! ${username} vs ${opponent.username} (Battle #${battleId})`);
+        
+        // Notify players
+        if (opponent.ws && opponent.ws.readyState === WebSocket.OPEN) {
+            opponent.ws.send(JSON.stringify({
+                type: 'match_found',
+                battleId: battleId,
+                opponent: username
+            }));
+        }
+        
+        return { matched: true, opponent: opponent.username, battleId };
+    } else {
+        // Add to da damnnn queue
+        matchmakingQueue.push({ username });
+        console.log(`[Matchmaking] ${username} added to queue. Queue size: ${matchmakingQueue.length}`);
+        return { matched: false };
+    }
+}
+
+function createBattleProcess(battleId, player1, player2) {
+    if (activeBattles.has(battleId)) {
+        console.log(`[Battle] Battle #${battleId} already exists`);
+        return activeBattles.get(battleId).process;
+    }
+
+    console.log(`[Battle] Creating battle #${battleId}: ${player1} vs ${player2}`);
+    
+    const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
+    const battleProcess = spawn(pythonCmd, [
+        '-u', 
+        path.join(__dirname, 'src', 'ingame.py'),
+        battleId.toString(),
+        player1,
+        player2
+    ]);
+    
+    activeBattles.set(battleId, {
+        player1,
+        player2,
+        process: battleProcess
+    });
+
+    battleProcess.on('spawn', () => {
+        console.log(`[Battle] Battle #${battleId} process spawned with PID: ${battleProcess.pid}`);
+    });
+
+    battleProcess.stderr.on('data', (data) => {
+        console.error(`[Battle ERROR] #${battleId}: ${data.toString()}`);
+    });
+
+    battleProcess.on('close', (code) => {
+        console.log(`[Battle] Battle #${battleId} ended with code ${code}`);
+        activeBattles.delete(battleId);
+    });
+
+    battleProcess.on('error', (err) => {
+        console.error(`[Battle] Failed to start battle #${battleId}:`, err);
+        activeBattles.delete(battleId);
+    });
+
+    return battleProcess;
+}
