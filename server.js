@@ -5,8 +5,8 @@ const path = require('path');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
-//hi
-const fs = require('fs')
+const request = require('request');
+const fs = require('fs');
 
 const connectionAttempts = new Map();
 const app = express();
@@ -38,6 +38,7 @@ const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) =>
     });
 }
 
+let service_mode = false; //Service mode stopps everyone from connecting for example during updates
 
 const gameInstances = new Map();
 
@@ -305,7 +306,15 @@ wss.on('connection', (ws, req) => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect(path.join(__dirname, 'public', 'login.html'));
+    res.redirect(path.join(__dirname, 'public', 'login.html')); 
+});
+
+app.post('/update', (req, res) => {
+    console.log(req.body);
+    res.send('Update request received');
+    if (req.body.pass === 'adfs') {
+        update_server();
+    }
 });
 
 app.get('/game', (req, res) => {
@@ -314,10 +323,15 @@ app.get('/game', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    
 });
 
 app.get('/matchmaking', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'matchmaking.html'));
+    if (service_mode) {
+        res.send("Not available during updates");
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'matchmaking.html'));
+    }
     console.log(`[Server] New Matchmaking attempt`)
 });
 
@@ -417,6 +431,28 @@ function findMatch(username) {
         return { matched: false };
     }
 }
+
+function update_server() {
+    service_mode = true;
+    console.log('Updating server...');
+    console.log("Waiting for all battles to finish(" + battleIdCounter + ")");
+    var update_interval = setInterval(() => {
+        if (battleIdCounter === 0) {
+            console.log("Proceeding to update");
+            request.post(
+                'http://localhost:8888/update',
+                { json: { pass: 'adfs' } },
+                function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        console.log(body);
+                    }
+                }
+            );
+            clearInterval(update_interval);
+        }
+    }, 1000);
+}
+
 
 function createBattleProcess(battleId, player1, player2) {
     if (activeBattles.has(battleId)) {
