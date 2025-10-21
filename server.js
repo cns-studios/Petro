@@ -119,6 +119,26 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/shutdown', (req, res) => {
+    console.log('[Server] Shutdown initiated.');
+    isShuttingDown = true;
+    res.status(200).send('Server is shutting down.');
+
+    const checkActiveBattles = () => {
+        if (activeBattles.size === 0) {
+            console.log('[Server] All battles have ended. Shutting down.');
+            server.close(() => {
+                process.exit(0);
+            });
+        } else {
+            console.log(`[Server] Waiting for ${activeBattles.size} active battles to end.`);
+            setTimeout(checkActiveBattles, 5000);
+        }
+    };
+
+    checkActiveBattles();
+});
+
 wss.on('connection', (ws, req) => {
 
     // Battle ws Server
@@ -270,11 +290,18 @@ wss.on('connection', (ws, req) => {
                         queueEntry.ws = ws;
                     }
                     
-                    ws.send(JSON.stringify({
-                        type: 'searching',
-                        message: 'Searching for opponent...',
-                        queuePosition: matchmakingQueue.length
-                    }));
+                    if (matchResult.reason === 'disabled') {
+                        ws.send(JSON.stringify({
+                            type: 'matchmaking_disabled',
+                            message: 'Matchmaking is temporarily disabled for a server update. Please try again in a moment.'
+                        }));
+                    } else {
+                        ws.send(JSON.stringify({
+                            type: 'searching',
+                            message: 'Searching for opponent...',
+                            queuePosition: matchmakingQueue.length
+                        }));
+                    }
                 }
             } else if (command === "leave_matchmaking") {
                 const index = matchmakingQueue.findIndex(p => p.username === username);
@@ -384,8 +411,13 @@ server.listen(PORT, () => {
 const matchmakingQueue = [];
 const activeBattles = new Map(); // FORMAType shii: battleId -> {player1, player2, process}
 let battleIdCounter = 0;
+let isShuttingDown = false;
 
 function findMatch(username) {
+    if (isShuttingDown) {
+        console.log('[Matchmaking] Matchmaking is disabled due to server shutdown.');
+        return { matched: false, reason: 'disabled' };
+    }
     // Remove player from queue if already there  --> GETOUTTTTT
     const existingIndex = matchmakingQueue.findIndex(p => p.username === username);
     if (existingIndex !== -1) {
