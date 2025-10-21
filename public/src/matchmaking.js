@@ -72,6 +72,16 @@ function connectWebSocket(username, pin) {
                 setTimeout(() => {
                     window.location.href = `/battle?battleId=${data.battleId}&username=${username}&pin=${pin}`;
                 }, 2000);
+            } else if (data.type === 'matchmaking_disabled') {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h1>Matchmaking Disabled</h1>
+                        <p>${data.message}</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.location.href = '/game';
+                }, 5000);
             } else if (data.type === 'left_queue') {
                 window.location.href = '/game';
             }
