@@ -1,0 +1,70 @@
+:root {
+  /* Define colors from the image */
+  --btn-base-color: #582630;   /* Main orange/red fill */
+  --btn-light-color: #92612a;  /* Top/Left highlight */
+  --btn-dark-color: #702131;   /* Bottom/Right shadow */
+  --btn-text-color: #d1842b;   /* Bright yellow text */
+  --pixel-size: 1px;           /* The unit of the border: 1 virtual pixel */
+}
+
+body {
+    background-color: rgb(20, 20, 20);
+}
+
+/* Base style for all pixel buttons */
+.pixel-button {
+  /* Dimensions - adjust for different buttons (e.g., 'START' is wider) */
+  width: 100px;
+  height: 30px;
+  
+  /* Text and alignment */
+  color: var(--btn-text-color);
+  font-family: 'Press Start 2P', monospace; /* Use a pixel font for authenticity */
+  font-size: 10px; 
+  text-align: center;
+  line-height: 30px; 
+  text-transform: uppercase;
+  cursor: pointer;
+  
+  /* Core look: ABSOLUTELY NO BORDER-RADIUS for sharp corners */
+  background-color: var(--btn-base-color);
+  border: none;
+  
+  /* THE PIXEL EFFECT: Multiple box-shadows create the 2-layer border */
+  box-shadow: 
+    /* 1. Top/Left Highlight (The inner light edge) */
+    calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-light-color),
+    /* 2. Right/Bottom Shadow (The inner dark edge) */
+    var(--pixel-size) var(--pixel-size) 0 0 var(--btn-dark-color),
+    
+    /* 3. Outer Left/Top Border (The dark outline, 2 pixels out) */
+    calc(-2 * var(--pixel-size)) calc(-2 * var(--pixel-size)) 0 0 var(--btn-dark-color),
+    /* 4. Outer Right/Bottom Border (The base color corner fill) */
+    calc(2 * var(--pixel-size)) calc(2 * var(--pixel-size)) 0 0 var(--btn-base-color);
+  
+  /* Use filter: drop-shadow for better scaling if needed, but box-shadow is more reliable for perfect 1px borders */
+  transition: all 0.05s linear; /* Use linear for a snappier pixel-like transition */
+}
+
+/* Hover effect: Subtle lift and color change */
+.pixel-button:hover {
+  background-color: var(--btn-light-color);
+  transform: translate(0, calc(-1 * var(--pixel-size))); /* Visual lift */
+}
+
+/* Active/Pressed effect: Simulates the button being physically pushed down into the screen */
+.pixel-button:active {
+  background-color: var(--btn-base-color);
+  /* Shift the button down by 1 pixel */
+  transform: translate(var(--pixel-size), var(--pixel-size));
+  
+  /* Modify shadows to look "pressed" into the frame */
+  box-shadow: 
+    /* Remove highlights/shadows since the button is flush */
+    0 0 0 0 transparent,
+    0 0 0 0 transparent,
+    
+    /* Only the dark outer frame is visible */
+    calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color), 
+    calc(1 * var(--pixel-size)) calc(1 * var(--pixel-size)) 0 0 var(--btn-base-color); 
+}

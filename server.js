@@ -209,6 +209,10 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/pixeling', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pixeling .html'));
+});
+
 app.use((req, res) => {
     res.status(404).send('File not found');
 });
