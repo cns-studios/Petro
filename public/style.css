@@ -84,16 +84,6 @@ canvas {
     margin-top: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
 #inv {
     padding: 20px;
     max-width: 1500px;
@@ -150,9 +140,6 @@ canvas {
 #inventory::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
-
-
-
 
 .pet-card {
     border: 1px solid #ccc;
@@ -239,14 +226,6 @@ canvas {
         background-position: 0% 50%;
     }
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -359,6 +338,10 @@ canvas {
     text-align: right;
 }
 
+
+
+
+
 /* Responsive Design */
 @media (max-width: 600px) {
     .shop-btn {
@@ -375,18 +358,6 @@ canvas {
         text-align: center;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 button {
     padding: 8px 12px;
@@ -447,43 +418,6 @@ button:hover {
     background-color: #f0f0f0;
 }
 
-#login-btn {
-    width: 100px;
-    margin-top: 10px;
-    border-radius: 15px;
-}
-
-#login-username {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#login-pin {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#signup-username {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#signup-btn {
-    width: 100px;
-    margin-top: 10px;
-    border-radius: 15px;
-}
-
-
 .header-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -523,12 +457,6 @@ header h1 {
     font-weight: 500;
     z-index: 1000;
     size: 300px;
-}
-
-
-.buttons {
-    display: flex;
-    gap: 0.5rem;
 }
 
 header button {
