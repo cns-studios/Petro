@@ -15,6 +15,10 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const wss_battle = new WebSocket.Server({ noServer: true });
 
+if (!fs.existsSync(path.join(__dirname, 'db'))) {
+    fs.mkdirSync(path.join(__dirname, 'db'));
+}
+
 const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) => {
     if (err) {
         console.error('Error opening database', err.message);
@@ -29,14 +33,13 @@ const db = new sqlite3.Database(path.join(__dirname, 'db', 'users.db'), (err) =>
 });if (!fs.existsSync(path.join(__dirname, 'db', 'users.db'))) {
     console.log('No database found, creating a new one.');
     db.serialize(() => {
-        db.run(`CREATE TABLE users (
+        db.run(`CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
             pin TEXT NOT NULL,
             game_state TEXT
         )`);
     });
 }
-
 
 const gameInstances = new Map();
 
