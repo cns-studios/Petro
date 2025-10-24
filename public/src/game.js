@@ -139,10 +139,6 @@ function Petsell() {
     }
 }
 
-function Sell_spezific_pet(item) {
-    messageEl.textContent = 'Click on the pet you want to sell.';
-}
-
 document.getElementById('save-btn').addEventListener('click', () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('save');
@@ -191,34 +187,50 @@ function updateUI(state) {
         }
     }
 
-   if (state.inventory) {
-    inventoryEl.innerHTML = '';
-    state.inventory.forEach(pet => {
-        const petCard = document.createElement('div');
-        petCard.className = 'pet-card';
-        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : pet.rarity === 3 ? 'legendary' : 'chroma'}`);
-        petCard.style.cursor = 'pointer';
-        petCard.innerHTML = `
-            <img class="src" src="/images/${pet.name}.png"><div class="name">${pet.name} (Lv. ${pet.level})</div>
-            <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
-            <div>Dodge: ${pet.dodge_chance}%</div>
-        `;
-        
-        petCard.addEventListener('click', () => {
+    // ===== NUR INVENTORY GEÄNDERT =====
+    if (state.inventory) {
+        inventoryEl.innerHTML = '';
+        state.inventory.forEach((pet, index) => {
+            const petCard = document.createElement('div');
+            petCard.className = 'pet-card';
             
-            if (sellMode) {
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(`spezific_pet_sell ${pet.name}`);
-                } else {
-                    messageEl.textContent = 'Connection lost. Please refresh the page.';
-                    console.error('WebSocket is not connected');
+            // Add rarity class
+            const rarityClass = pet.rarity === 1 ? 'common' : 
+                               pet.rarity === 2 ? 'rare' : 
+                               pet.rarity === 3 ? 'legendary' : 'chroma';
+            petCard.classList.add(`rarity-${rarityClass}`);
+            
+            // Add animation delay for stagger effect
+            petCard.style.animationDelay = `${index * 0.05}s`;
+            
+            petCard.innerHTML = `
+                <img class="src" src="/images/${pet.name}.png" alt="${pet.name}">
+                <div class="name">${pet.name} (Lv. ${pet.level})</div>
+                <div class="stats">ATK: ${pet.attack} | HP: ${pet.hp}</div>
+                <div class="dodge">Dodge: ${pet.dodge_chance}%</div>
+            `;
+            
+            // Click handler for selling pets
+            petCard.addEventListener('click', () => {
+                if (sellMode) {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(`spezific_pet_sell ${pet.name}`);
+                        sellMode = false;
+                        const button = document.getElementById('sell-pet-btn');
+                        button.textContent = 'Sell Pet';
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-info');
+                    } else {
+                        messageEl.textContent = 'Connection lost. Please refresh the page.';
+                        console.error('WebSocket is not connected');
+                    }
                 }
-            }
+            });
+            
+            inventoryEl.appendChild(petCard);
         });
-        
-        inventoryEl.appendChild(petCard);
-    });
     }
+    // ===== ENDE INVENTORY ÄNDERUNG =====
 
     if (state.shop) {
         shopUpEl.textContent = state.shop.upgrade_pack;
