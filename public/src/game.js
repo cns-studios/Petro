@@ -139,6 +139,10 @@ function Petsell() {
     }
 }
 
+function Sell_spezific_pet(item) {
+    messageEl.textContent = 'Click on the pet you want to sell.';
+}
+
 document.getElementById('save-btn').addEventListener('click', () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('save');

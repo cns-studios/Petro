@@ -94,33 +94,10 @@ canvas {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Inventory Section */
 #inv {
-    padding: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 20px;
+    max-width: 1500px;
+    margin: 80px auto 0;
 }
 
 #inv h1 {
@@ -407,34 +384,6 @@ canvas {
         box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
