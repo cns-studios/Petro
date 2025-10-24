@@ -210,7 +210,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/pixeling', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pixeling .html'));
+    res.sendFile(path.join(__dirname, 'public', 'pixel.html'));
 });
 
 app.use((req, res) => {
