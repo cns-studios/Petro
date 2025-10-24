@@ -692,7 +692,8 @@ header h1 {
 }
 
 #goto-home img.home-icon {
-    width: 130px;
+    margin-top: 30px;
+    width: 70px;
     height: auto;
     display: block;
     image-rendering: pixelated;
