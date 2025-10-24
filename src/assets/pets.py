@@ -142,7 +142,7 @@ komodo_dragon_stats = {"attack": 40 * level_multiplayer, "hp": 70 * level_multip
 elephant_stats = {"attack": 30 * level_multiplayer, "hp": 150 * level_multiplayer, "rarity": 3, "dodge_chance": 0, "class": [1]}
 
 #prehistoric
-t_rex_stats = {"attack": 200 * level_multiplayer, "hp": 500 * level_multiplayer, "rarity": 10, "dodge_chance": 15, "class": [1, 4]}
+t_rex_stats = {"attack": 150 * level_multiplayer, "hp": 500 * level_multiplayer, "rarity": 10, "dodge_chance": 15, "class": [1, 4]}
 
 
 
