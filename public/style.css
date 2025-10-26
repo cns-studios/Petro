@@ -535,6 +535,13 @@ header h1 {
     font-size: 0.8rem;
 }
 
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #money {
     color: #ffdd0f;
     font-weight: bold;
@@ -548,10 +555,28 @@ header h1 {
     color: #ffdd0f;
     font-size: 2rem;
     font-family: 'Press Start 2P', monospace;
+    display: block;
 }
 
 .money-symbol {
     font-family: 'Press Start 2P', monospace;
+}
+
+.timer-container {
+    margin-top: 10px;
+    color: #ffe11f;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    display: block;
+}
+
+.timer-label {
+    color: #d8cd00;
+}
+
+#timer {
+    color: hsl(57, 100%, 42%);
+    font-weight: bold;
 }
 
 #message-container {

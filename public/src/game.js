@@ -280,6 +280,124 @@ function selectBuff(index) {
 
 
 
+// Timer-Konfiguration (in Sekunden)
+const TIMER_DURATION = 500; // Hier die gewünschte Zeit in Sekunden einstellen
+
+let timerValue = TIMER_DURATION;
+let timerInterval = null;
+
+// Timer-Element
+const timerEl = document.getElementById('timer');
+
+// Cookie-Funktionen
+function setCookie(name, value, days = 365) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+// Funktion zum Senden der afk-money Nachricht
+function sendAfkMoney() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('afk-money');
+        console.log('afk-money gesendet');
+    } else {
+        console.error('WebSocket ist nicht verbunden');
+    }
+}
+
+// Timer-Funktion
+function updateTimer() {
+    timerValue--;
+    
+    if (timerEl) {
+        timerEl.textContent = timerValue;
+    }
+    
+    // Speichere aktuellen Timer-Wert in Cookie
+    setCookie('afk_timer_value', timerValue);
+    setCookie('afk_timer_timestamp', Date.now());
+    
+    // Wenn Timer 0 erreicht
+    if (timerValue <= 0) {
+        sendAfkMoney();
+        timerValue = TIMER_DURATION; // Timer zurücksetzen
+        setCookie('afk_timer_value', timerValue);
+    }
+}
+
+// Timer aus Cookie laden
+function loadTimerFromCookie() {
+    const savedValue = getCookie('afk_timer_value');
+    const savedTimestamp = getCookie('afk_timer_timestamp');
+    
+    if (savedValue !== null && savedTimestamp !== null) {
+        const timeElapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
+        let calculatedValue = parseInt(savedValue) - timeElapsed;
+        
+        // Berechne wie viele komplette Zyklen vergangen sind
+        while (calculatedValue <= 0) {
+            // Timer hätte 0 erreicht, sende Nachricht
+            sendAfkMoney();
+            calculatedValue += TIMER_DURATION;
+        }
+        
+        return calculatedValue;
+    }
+    
+    return TIMER_DURATION;
+}
+
+// Timer starten
+function startTimer() {
+    // Falls bereits ein Timer läuft, stoppe ihn
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    
+    // Lade Timer aus Cookie
+    timerValue = loadTimerFromCookie();
+    
+    if (timerEl) {
+        timerEl.textContent = timerValue;
+    }
+    
+    // Starte neuen Timer (aktualisiert jede Sekunde)
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+// Timer automatisch starten wenn Seite geladen wird
+window.addEventListener('load', () => {
+    startTimer();
+});
+
+// Optional: Timer stoppen
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+// Speichere Timer auch beim Verlassen der Seite
+window.addEventListener('beforeunload', () => {
+    setCookie('afk_timer_value', timerValue);
+    setCookie('afk_timer_timestamp', Date.now());
+});
+
+
 
 // Page Navigation
 
