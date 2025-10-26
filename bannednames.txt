@@ -1,0 +1,4 @@
+# All names are banned if it includes any of the following words
+owner
+admin
+dev

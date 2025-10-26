@@ -5,7 +5,11 @@ const path = require('path');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
-const fs = require('fs')
+const fs = require('fs');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const connectionAttempts = new Map();
 const app = express();
@@ -17,6 +21,18 @@ const devMode = true;
 // Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
 const wss = new WebSocket.Server({ noServer: true });
 const wss_battle = new WebSocket.Server({ noServer: true });
+
+const bannedNames = fs.readFileSync(path.join(__dirname, 'bannednames.txt'), 'utf-8').split('\n');
+
+for (let i = 0; i < bannedNames.length; i++) {
+    if (bannedNames[i] === '') {
+        delete bannedNames[i];
+    } else if (bannedNames[i].startsWith('#')) {
+        delete bannedNames[i];
+    } else {
+        bannedNames[i] = bannedNames[i].trim();
+    }
+}
 
 if (!fs.existsSync(path.join(__dirname, 'db'))) {
     fs.mkdirSync(path.join(__dirname, 'db'));
@@ -87,11 +103,46 @@ function createGameProcess(username) {
     return gameProcess;
 }
 
+async function checkGemini(username) {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const prompt = "Please respond in one word only if this username is supposed to be banned only check if there are any insultwords or pedophilia words or any other words or sentences that are bad. If it is not banned respond with 'no' if it is banned respond with 'yes'"
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        console.log(`Gemini check for ${username}: ${text}`);
+        
+    } catch (error) {
+        console.error('Signup Gemini check error:', error.message);
+        console.log(`Cannot check Gemini for ${username}`);
+        console.log(`Continuing anyway`);
+    }
+}
+
 app.post('/signup', (req, res) => {
     const { username } = req.body;
     if (!username) {
         return res.status(400).json({ message: 'Username is required.' });
     }
+    for (let i = 0; i < bannedNames.length; i++) {
+        if (username.toLowerCase().includes(bannedNames[i])) {
+            if (devMode && username.startsWith('dev_')) {
+                continue;
+            }
+            console.log(`[Server] User ${username} is banned.`);
+            return res.status(400).json({ message: 'Username is banned.' });
+        }
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+        if (devMode && username.startsWith('dev_')) {
+            
+        } else {
+            return res.status(400).json({ message: 'Username must only contain letters and numbers.' });
+        }
+    }
+    
+    //checkGemini(username);
+
     let pin;
     if (username.startsWith('dev_') && devMode) {
         pin = "0"
