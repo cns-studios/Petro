@@ -286,7 +286,6 @@ function selectBuff(index) {
 const gotoInvbtn = document.getElementById('goto-inv');
 const gotoShopbtn = document.getElementById('goto-shop');
 const gotoSettingsbtn = document.getElementById('goto-settings');
-const gotoCollectionbtn = document.getElementById('goto-collection');
 const gotoHomebtn = document.getElementById('goto-home');
 
 const homePage = document.getElementById('home');
@@ -306,7 +305,6 @@ gotoHomebtn.addEventListener('click', () => {
     homePage.style.display = 'block';
     gotoHomebtn.style.display = 'none';
 
-    gotoCollectionbtn.style.display = 'block';
     gotoShopbtn.style.display = 'block';
     gotoSettingsbtn.style.display = 'block';
     gotoInvbtn.style.display = 'block';
@@ -323,7 +321,6 @@ gotoInvbtn.addEventListener('click', () => {
 
     homePage.style.display = 'none';
 
-    gotoCollectionbtn.style.display = 'none';
     gotoShopbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
 });
@@ -334,7 +331,6 @@ gotoShopbtn.addEventListener('click', () => {
 
     homePage.style.display = 'none';
 
-    gotoCollectionbtn.style.display = 'none';
     gotoShopbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
 });
@@ -345,21 +341,7 @@ gotoSettingsbtn.addEventListener('click', () => {
 
     homePage.style.display = 'none';
 
-    gotoCollectionbtn.style.display = 'none';
     gotoShopbtn.style.display = 'none';
     gotoSettingsbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
-});
-
-gotoCollectionbtn.addEventListener('click', () => {
-    collectionPage.style.display = 'block';
-    gotoHomebtn.style.display = 'block';
-
-    homePage.style.display = 'none';
-
-    gotoCollectionbtn.style.display = 'none';
-    gotoShopbtn.style.display = 'none';
-    gotoSettingsbtn.style.display = 'none';
-    gotoInvbtn.style.display = 'none';
-
 });
