@@ -299,7 +299,6 @@ gotoHomebtn.style.display = 'none';
 invPage.style.display = 'none';
 shopPage.style.display = 'none';
 settingsPage.style.display = 'none';
-collectionPage.style.display = 'none'
 
 gotoHomebtn.addEventListener('click', () => {
     homePage.style.display = 'block';
