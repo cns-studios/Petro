@@ -1,5 +1,6 @@
 let ws;
 let stateRequestTimeout = null;
+let sellMode = false;
 
 // Cookie and auth functions
 function logout() {
@@ -42,6 +43,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!username || !pin) {
         window.location.href = '/login';
     } else {
+        // Display username
+        const usernameEl = document.getElementById('username');
+        if (usernameEl) {
+            usernameEl.textContent = username;
+        }
         connectWebSocket(username, pin);
     }
 });
@@ -144,6 +150,24 @@ document.getElementById('save-btn').addEventListener('click', () => {
     }
 });
 
+function Sell_spezific_pet() {
+    sellMode = !sellMode;
+    const button = document.getElementById('sell-pet-btn');
+    
+    if (sellMode) {
+        button.textContent = 'Cancel';
+        button.classList.remove('btn-info');
+        button.classList.add('btn-danger');
+        messageEl.textContent = 'Click on a pet to sell it';
+    } else {
+        button.textContent = 'Sell Pet';
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-info');
+        messageEl.textContent = '';
+    }
+}
+
+
 
 playBtn.addEventListener('click', () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -153,10 +177,18 @@ playBtn.addEventListener('click', () => {
 
 function updateUI(state) {
     if (state.money !== undefined) moneyEl.textContent = state.money;
-    if (state.stage !== undefined) stageEl.textContent = state.stage;
+    
     
     if (state.message) {
         messageEl.textContent = state.message;
+        
+        const container = document.getElementById('message-container');
+        container.style.animation = 'none';
+        container.offsetHeight; // Trigger reflow
+        container.style.animation = 'messagePopup 3s ease-in-out forwards';
+
+
+
         if (state.message !== 'Choose a buff.' && !state.message.includes('Welcome')) {
             setTimeout(() => {
                 if (messageEl.textContent === state.message) {
@@ -171,23 +203,26 @@ function updateUI(state) {
     state.inventory.forEach(pet => {
         const petCard = document.createElement('div');
         petCard.className = 'pet-card';
-        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : 'legendary'}`);
+        petCard.classList.add(`rarity-${pet.rarity === 1 ? 'common' : pet.rarity === 2 ? 'rare' : pet.rarity === 3 ? 'legendary' : 'chroma'}`);
         petCard.style.cursor = 'pointer';
         petCard.innerHTML = `
-            <div class="name">${pet.name} (Lv. ${pet.level})</div>
+            <img class="src" src="/images/${pet.name}.png"><div class="name">${pet.name} (Lv. ${pet.level})</div>
             <div>ATK: ${pet.attack} | HP: ${pet.hp}</div>
             <div>Dodge: ${pet.dodge_chance}%</div>
-            <div>Rarity: ${pet.rarity}</div>
         `;
+        
         petCard.addEventListener('click', () => {
+            
+            if (sellMode) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(`spezific_pet_sell ${pet.name}`);
                 } else {
                     messageEl.textContent = 'Connection lost. Please refresh the page.';
                     console.error('WebSocket is not connected');
-    }
                 }
-        );
+            }
+        });
+        
         inventoryEl.appendChild(petCard);
     });
     }
@@ -242,3 +277,70 @@ function selectBuff(index) {
         console.error('WebSocket is not connected');
     }
  }
+
+
+
+
+// Page Navigation
+
+const gotoInvbtn = document.getElementById('goto-inv');
+const gotoShopbtn = document.getElementById('goto-shop');
+const gotoSettingsbtn = document.getElementById('goto-settings');
+const gotoHomebtn = document.getElementById('goto-home');
+
+const homePage = document.getElementById('home');
+const invPage = document.getElementById('inv');
+const shopPage = document.getElementById('shop');
+const settingsPage = document.getElementById('settings');
+const collectionPage = document.getElementById('collection');
+
+gotoHomebtn.style.display = 'none';
+
+invPage.style.display = 'none';
+shopPage.style.display = 'none';
+settingsPage.style.display = 'none';
+
+gotoHomebtn.addEventListener('click', () => {
+    homePage.style.display = 'block';
+    gotoHomebtn.style.display = 'none';
+
+    gotoShopbtn.style.display = 'block';
+    gotoSettingsbtn.style.display = 'block';
+    gotoInvbtn.style.display = 'block';
+
+    invPage.style.display = 'none';
+    shopPage.style.display = 'none';
+    settingsPage.style.display = 'none';
+    collectionPage.style.display = 'none';
+});
+
+gotoInvbtn.addEventListener('click', () => {
+    invPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoShopbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
+
+gotoShopbtn.addEventListener('click', () => {
+    shopPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoShopbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});
+
+gotoSettingsbtn.addEventListener('click', () => {
+    settingsPage.style.display = 'block';
+    gotoHomebtn.style.display = 'block';
+
+    homePage.style.display = 'none';
+
+    gotoShopbtn.style.display = 'none';
+    gotoSettingsbtn.style.display = 'none';
+    gotoInvbtn.style.display = 'none';
+});

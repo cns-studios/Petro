@@ -341,6 +341,14 @@ app.get('/game', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'game.html'));
 });
 
+app.use('/images', express.static(path.join(__dirname, 'src/assets/pets')));
+
+app.use('/sprites', express.static(path.join(__dirname, 'assets/images/sprites')));
+
+app.get('/game', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'game.html'));
+});
+    
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });

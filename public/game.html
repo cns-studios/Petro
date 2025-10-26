@@ -7,40 +7,120 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="background-container">
+        <canvas id="balatroCanvas"></canvas>
+    </div>
+
+    <div id="message-container">
+        <p id="message"></p>
+    </div>
+
     <header>
-            <h1>Petro</h1>
+    <div class="header-container">
+        <div class="header-controls">
             <div class="stats">
-                <span>Money: <span id="money">0</span></span>
-                <span>Stage: <span id="stage">0</span></span>
+                <span class="money-label">
+                    <span class="money-symbol">$</span><span id="money">0</span>
+                </span>
+                
             </div>
-            <button id="save-btn">Save Game</button>
-            <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
-            <button onclick="Petsell()" style="background-color: #ffc107;">Sell All Pets</button> 
-            <button onclick="Sell_spezific_pet()" style="background-color: #17a2b8;">click on pet you want to sell</button>
-        </header>
+            
+        </div>
+        
+    </div>
+    
+
+    <div class="petro">
+        <h1>Petro</h1>
+        <button id="save-btn">Save</button>
+        <div id="user-display">User: <span id="username"></span></div>
+        <button onclick="logout()" class="btn-danger">Logout</button>
+        <button id="goto-settings">
+            <img class="settings-icon" src="/sprites/settings.png" alt="Shop">
+        </button>
+    </div>
+
+    </header>
+        
+
+        <div class="page-navigation">
+            <button id="goto-inv">
+                <img class="inv-icon" src="/sprites/inv.png" alt="Shop">
+                <span>Inv</span>
+            </button>
+            <button id="goto-shop">
+                <img class="shop-icon" src="/sprites/shop.png" alt="Shop">
+                <span>Shop</span>
+            </button>
+            <button id="goto-home">
+                <img class="home-icon" src="/sprites/back.png" alt="Shop">
+            </button>
+        </div>
+
+
+        <div id="home">
+        </div>
+
+
+
+
+        <div id="inv">
+            <h1>Inventory</h1>
+            <div class="inv-buttons">
+                <button onclick="Petsell()" class="btn-warning">Sell All</button>
+                <button id="sell-pet-btn" onclick="Sell_spezific_pet(event)" class="btn-info">Sell Pet</button>
+            </div>
+            <div id="inventory-container">
+                
+                <div id="inventory"></div>
+            </div>
+        </div>
+
+        <div id="shop">
+            <h1>Shop</h1>
+            <div id="shop-container">
+                <div class="shop-actions">
+                    <button class="shop-btn" onclick="buy('up')">
+                        <span class="shop-btn-text">Buy Upgrade Pack</span>
+                        <span class="shop-btn-price">3$</span>
+                        <span class="shop-btn-stock">[<span id="shop-up">0</span>]</span>
+                    </button>
+                    <button class="shop-btn" onclick="buy('bp')">
+                        <span class="shop-btn-text">Buy Buff Pack</span>
+                        <span class="shop-btn-price">4$</span>
+                        <span class="shop-btn-stock">[<span id="shop-bp">0</span>]</span>
+                    </button>
+                    <button class="shop-btn" onclick="buy('cp')">
+                        <span class="shop-btn-text">Buy Character Pack</span>
+                        <span class="shop-btn-price">8$</span>
+                        <span class="shop-btn-stock">[<span id="shop-cp">0</span>]</span>
+                    </button>
+                    <button class="shop-btn legendary" onclick="buy('lup')">
+                        <span class="shop-btn-text">Buy Legendary Upgrade Pack</span>
+                        <span class="shop-btn-price">10$</span>
+                        <span class="shop-btn-stock">[<span id="shop-lup">0</span>]</span>
+                    </button>
+                    <button class="shop-btn reroll" onclick="rerollShop()">
+                        <span class="shop-btn-text">Reroll Shop</span>
+                        <span class="shop-btn-price"><span id="reroll-price">5</span>$</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="settings">
+        </div>
 
         <main>
             <div id="message-container">
                 <p id="message"></p>
             </div>
+            
 
-            <div id="inventory-container">
-                <h2>Your Pets</h2>
-                <div id="inventory"></div>
-            </div>
+            
+        <button id="play-btn">Play Petro Online</button>
+            
 
-            <div id="shop-container">
-                <h2>Shop</h2>
-                <div class="shop-actions">
-                    <button onclick="buy('up')">Buy Upgrade Pack (3$) [<span id="shop-up">0</span>]</button>
-                    <button onclick="buy('bp')">Buy Buff Pack (4$) [<span id="shop-bp">0</span>]</button>
-                    <button onclick="buy('cp')">Buy Character Pack (8$) [<span id="shop-cp">0</span>]</button>
-                    <button onclick="buy('lup')">Buy Legendary Upgrade Pack (10$) [<span id="shop-lup">0</span>]</button>
-                    <button onclick="rerollShop()">Reroll Shop (<span id="reroll-price">5</span>$)</button>
-                </div>
-            </div>
-
-            <button id="play-btn">Play Petro Online</button>
+            
         </main>
 
         <div id="buff-selection" class="modal-overlay" style="display: none;">
@@ -49,6 +129,11 @@
                 <div id="buff-choices"></div>
             </div>
         </div>
+
+        
+        
+
+
 <script src="/src/game.js"></script>
 </body>
 </html>

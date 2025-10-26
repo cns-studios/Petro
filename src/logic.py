@@ -30,7 +30,8 @@ def push_state(username, game):
             'available_pets': {
                 'common': game.available_common_pets,
                 'rare': game.available_rare_pets,
-                'legendary': game.available_legendary_pets
+                'legendary': game.available_legendary_pets,
+                'prehistoric': game.available_prehistoric_pets
             }
         }
         

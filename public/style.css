@@ -1,38 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --btn-base-color: #582630;
+  --btn-light-color: #92612a;
+  --btn-dark-color: #702131;
+  --btn-text-color: #d1842b;
+  --bg-primary: #0a0e27;
+  --bg-secondary: #582630;
+  --accent-gold: #d1842b;
+  --pixel-size: 2px;
+  --border-size: 3px;
+}
+
 body {
-    font-family: sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: rgb(20, 20, 20);
+    font-family: 'Press Start 2P', monospace;
+}
+
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    color: var(--btn-text-color);
+    text-align: center;
+    padding: 50px;
+}
+
+#home {
+    position: fixed;
+    text-align: center;
+    margin: 0;
+    top: 130px;
+}
+
+#home h1 {
+    margin-top: 0;
+    padding-top: 10px; 
+    font-size: 2rem;
+    color: var(--accent-gold);
+    text-shadow: 
+        var(--pixel-size) 0 0 var(--btn-dark-color),
+        calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color),
+        0 var(--pixel-size) 0 var(--btn-dark-color),
+        0 calc(-1 * var(--pixel-size)) 0 var(--btn-dark-color);
 }
 
 #game-container {
     width: 800px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: var(--btn-base-color);
+    border: none;
     padding: 20px;
+    box-shadow: 
+        0 0 0 var(--border-size) var(--btn-dark-color),
+        0 0 0 calc(var(--border-size) * 2) var(--btn-light-color);
 }
 
 #header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #eee;
+    border-bottom: var(--border-size) solid var(--btn-dark-color);
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
 
 #header h1 {
     margin: 0;
+    color: var(--accent-gold);
+    font-size: 1.5rem;
 }
 
 #stats span {
     margin-left: 20px;
-    font-size: 1.2em;
+    font-size: 0.8em;
+    color: var(--accent-gold);
 }
 
 .section {
@@ -40,159 +101,685 @@ body {
 }
 
 .section h2 {
-    border-bottom: 1px solid #ddd;
+    border-bottom: var(--border-size) solid var(--btn-dark-color);
     padding-bottom: 5px;
     margin-top: 0;
+    color: var(--accent-gold);
+    font-size: 1.2rem;
+}
+
+/* INVENTORY */
+#inv {
+    padding: 20px;
+    max-width: 1500px;
+    margin: 80px auto 0;
+}
+
+#inv h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--accent-gold);
+    font-size: 2rem;
+    text-shadow: 
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 var(--btn-dark-color);
+}
+
+.inv-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#inventory-container {
+    margin-top: 20px;
+    position: relative;
+}
+
+#inventory-container h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--accent-gold);
+    font-size: 1.2rem;
 }
 
 #inventory {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    max-height: 75vh;
+    overflow-y: scroll;
+    padding: 10px 0 10px 10px;
+    direction: ltr;
 }
 
+#inventory::-webkit-scrollbar {
+    width: 12px;
+}
+
+#inventory::-webkit-scrollbar-track {
+    background: var(--btn-dark-color);
+}
+
+#inventory::-webkit-scrollbar-thumb {
+    background: var(--btn-base-color);
+    box-shadow: 
+        inset 0 0 0 2px var(--btn-light-color),
+        inset 0 0 0 4px var(--btn-dark-color);
+}
+
+#inventory::-webkit-scrollbar-thumb:hover {
+    background: var(--btn-light-color);
+}
+
+/* PET CARDS */
 .pet-card {
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: none;
     padding: 15px;
-    background-color: #fafafa;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--btn-base-color);
+    transition: transform 0.1s;
     cursor: pointer;
+    box-shadow: 
+        0 0 0 var(--border-size) var(--btn-dark-color),
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 0 #000;
+    image-rendering: pixelated;
+}
+
+.pet-card img {
+    width: 100px;   
+    height: 100px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px auto;
+    image-rendering: pixelated;
 }
 
 .pet-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translate(calc(-1 * var(--pixel-size)), calc(-1 * var(--pixel-size)));
+}
+
+.pet-card:active {
+    transform: translate(var(--pixel-size), var(--pixel-size));
+    box-shadow: 
+        0 0 0 var(--border-size) var(--btn-dark-color);
 }
 
 .pet-card.rarity-common {
     background-color: #29a200;
-    border-color: #008a20;
+    box-shadow: 
+        0 0 0 var(--border-size) #1a7000,
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 0 #000;
 }
 
 .pet-card.rarity-common:hover {
-    background-color: #02791c;
-    border-color: #0f5802;
-    
+    background-color: #33c200;
 }
 
 .pet-card.rarity-rare {
     background-color: #1c63b9;
-    border-color: #0e1a77;
+    box-shadow: 
+        0 0 0 var(--border-size) #0e3a77,
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 0 #000;
 }
 
 .pet-card.rarity-rare:hover {
-    background-color: #003a5f;
-    border-color: #000d58;
-    font-weight: bold;
+    background-color: #2573d9;
 }
 
 .pet-card.rarity-legendary {
     background-color: #e7ca0d;
-    border-color: #b69014;
+    box-shadow: 
+        0 0 0 var(--border-size) #b69014,
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 0 #000;
 }
 
 .pet-card.rarity-legendary:hover {
-    background-color: #b59702;
-    border-color: #876700;
-    
-}
-.shop-item {
-    margin-bottom: 10px;
+    background-color: #ffdd0f;
 }
 
-button {
-    padding: 8px 12px;
+.pet-card.rarity-chroma {
+    background: #ff0000;
+    animation: chroma-pulse 0.5s steps(4) infinite;
+    box-shadow: 
+        0 0 0 var(--border-size) #ffffff,
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 0 #000,
+        0 0 10px #ff0000;
+}
+
+.pet-card.rarity-chroma:hover {
+    animation: chroma-pulse 0.3s steps(4) infinite;
+}
+
+@keyframes chroma-pulse {
+    0% { background-color: #ff0000; }
+    25% { background-color: #ff6200; }
+    50% { background-color: #ff0000; }
+    75% { background-color: #ff6200; }
+    100% { background-color: #ff0000; }
+}
+
+/* SHOP */
+#shop {
+    padding: 20px;
+    max-width: 800px;
+    margin: 80px auto 0;
+}
+
+#shop h1 {
+    text-align: center;
+    color: var(--accent-gold);
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    text-shadow: 
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 var(--btn-dark-color);
+}
+
+#shop-container {
+    background: var(--btn-base-color);
     border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 4px;
+    padding: 30px;
+    box-shadow: 
+        0 0 0 var(--border-size) var(--btn-dark-color),
+        0 0 0 calc(var(--border-size) * 2) var(--btn-light-color),
+        calc(var(--pixel-size) * 3) calc(var(--pixel-size) * 3) 0 0 #000;
+}
+
+.shop-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.shop-btn {
+    background: var(--btn-base-color);
+    border: none;
+    padding: 20px 25px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.05s linear;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Press Start 2P', monospace;
+    color: var(--btn-text-color);
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-light-color),
+        var(--pixel-size) var(--pixel-size) 0 0 var(--btn-dark-color),
+        calc(-2 * var(--pixel-size)) calc(-2 * var(--pixel-size)) 0 0 var(--btn-dark-color),
+        calc(2 * var(--pixel-size)) calc(2 * var(--pixel-size)) 0 0 var(--btn-base-color);
+}
+
+.shop-btn:hover {
+    background-color: var(--btn-light-color);
+    transform: translate(0, calc(-1 * var(--pixel-size)));
+}
+
+.shop-btn:active {
+    background-color: var(--btn-base-color);
+    transform: translate(var(--pixel-size), var(--pixel-size));
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color), 
+        calc(1 * var(--pixel-size)) calc(1 * var(--pixel-size)) 0 0 var(--btn-base-color);
+}
+
+
+.shop-btn.reroll {
+    background: #702131;
+    margin-top: 10px;
+}
+
+.shop-btn.reroll:hover {
+    background: #8a2a3d;
+}
+
+.shop-btn-text {
+    flex: 1;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.shop-btn-price {
+    color: #ffdd0f;
+    font-weight: bold;
+    margin: 0 15px;
+    font-size: 1rem;
+    text-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 #000;
+}
+
+.shop-btn-stock {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.7rem;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* BUTTONS */
+button {
+    padding: 10px 15px;
+    border: none;
+    background-color: var(--btn-base-color);
+    color: var(--btn-text-color);
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    transition: all 0.05s linear;
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-light-color),
+        var(--pixel-size) var(--pixel-size) 0 0 var(--btn-dark-color),
+        calc(-2 * var(--pixel-size)) calc(-2 * var(--pixel-size)) 0 0 var(--btn-dark-color),
+        calc(2 * var(--pixel-size)) calc(2 * var(--pixel-size)) 0 0 var(--btn-base-color);
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--btn-light-color);
+    transform: translate(0, calc(-1 * var(--pixel-size)));
+}
+
+button:active {
+    transform: translate(var(--pixel-size), var(--pixel-size));
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color), 
+        calc(1 * var(--pixel-size)) calc(1 * var(--pixel-size)) 0 0 var(--btn-base-color);
 }
 
 #reroll-btn {
-    background-color: #28a745;
+    background-color: #29a200;
 }
 
 #reroll-btn:hover {
-    background-color: #218838;
+    background-color: #33c200;
 }
 
+#save-btn {
+    margin-right: 30px;
+    left: 10px;
+    top: 10px;
+    position: fixed;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+header .btn-danger {
+    margin-bottom: 10px;
+    margin-left: 20px;
+    position: fixed;
+    left: 82px;
+    top: 10px;
+    z-index: 9999;
+}
+
+.btn-warning {
+    background-color: #E3953D;
+    color: #000;
+    padding: 10px 15px;
+}
+
+.btn-warning:hover {
+    background-color: #ffb30f;
+}
+
+.btn-info {
+    background-color: #803242;
+    color: white;
+    padding: 10px 15px;
+}
+
+.btn-info:hover {
+    background-color: #993e50;
+}
+
+/* MESSAGE CENTER */
 #message-center {
-    background-color: #e9ecef;
+    background-color: var(--btn-base-color);
     padding: 10px;
-    border-radius: 5px;
+    border: none;
+    box-shadow: 
+        0 0 0 var(--border-size) var(--btn-dark-color);
 }
 
+/* MODAL */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10000;
 }
 
 .modal {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+    background: var(--btn-base-color);
+    padding: 30px;
+    border: none;
     width: 400px;
+    color: var(--btn-text-color);
+    box-shadow: 
+        0 0 0 calc(var(--border-size) * 2) var(--btn-dark-color),
+        0 0 0 calc(var(--border-size) * 4) var(--btn-light-color),
+        calc(var(--pixel-size) * 4) calc(var(--pixel-size) * 4) 0 0 #000;
+}
+
+.modal h2 {
+    color: var(--accent-gold);
+    font-size: 1.3rem;
+    margin-bottom: 20px;
 }
 
 .buff-choice {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 15px;
+    border: none;
     margin-top: 10px;
-    border-radius: 4px;
     cursor: pointer;
+    background: var(--btn-dark-color);
+    color: var(--btn-text-color);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    box-shadow: 
+        0 0 0 2px var(--btn-base-color);
+    transition: all 0.05s;
 }
 
 .buff-choice:hover {
-    background-color: #f0f0f0;
+    background-color: var(--btn-light-color);
+    transform: translate(calc(-1 * var(--pixel-size)), calc(-1 * var(--pixel-size)));
 }
 
-#login-btn {
+.buff-choice:active {
+    transform: translate(var(--pixel-size), var(--pixel-size));
+}
+
+/* HEADER */
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    position: fixed;
+    top: 0;
+}
+
+header h1 {
+    margin: 0;
+    color: var(--accent-gold);
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 var(--btn-dark-color);
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.stats {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    color: var(--accent-gold);
+    font-weight: 500;
+    z-index: 1000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+}
+
+#money {
+    color: #ffdd0f;
+    font-weight: bold;
+    font-size: 2rem;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 var(--btn-dark-color);
+}
+
+.money-label {
+    color: #ffdd0f;
+    font-size: 2rem;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.money-symbol {
+    font-family: 'Press Start 2P', monospace;
+}
+
+#message-container {
+    background: var(--btn-base-color);
+    padding: 2rem 3rem;
+    box-shadow: 
+        0 0 0 calc(var(--border-size) * 2) var(--btn-dark-color),
+        0 0 0 calc(var(--border-size) * 4) var(--btn-light-color);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    border: none;
+    z-index: 1000;
+    max-width: 500px;
+    min-width: 300px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes messagePopup {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+
+#message-container p {
+    color: var(--accent-gold);
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.2rem;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 #000;
+}
+
+.stage-label {
+    color: #2573d9;
+    font-family: 'Press Start 2P', monospace;
+}
+
+#stage {
+    color: #33c2ff;
+    font-weight: bold;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 var(--btn-dark-color);
+}
+
+.page-navigation {
+    display: flex;
+    gap: 0.5rem; 
+}
+
+.petro {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+    padding: 20px 0;
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* NAVIGATION BUTTONS WITH ICONS */
+#goto-inv,
+#goto-shop,
+#goto-home,
+#goto-settings,
+#goto-collection {
+    display: inline-block;
+    border: none;
+    background: none; 
+    padding: 0; 
+    margin: 0;
+    box-shadow: none; 
+    cursor: pointer;
+    position: fixed;
+    transition: transform 0.1s;
+    image-rendering: pixelated;
+}
+
+#goto-inv:active,
+#goto-shop:active,
+#goto-home:active,
+#goto-collection:active {
+    transform: translate(var(--pixel-size), var(--pixel-size)); 
+}
+
+#goto-inv {
+    left: 100px;
+    bottom: 300px;
+}
+
+#goto-inv img.inv-icon {
+    width: 150px;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#goto-shop {
+    right: 0;
+    bottom: 300px;
+}
+
+#goto-shop img.shop-icon {
+    width: 200px;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#goto-home {
+    left: 0;
+    top: 100px;
+}
+
+#goto-home img.home-icon {
+    margin-top: 30px;
+    width: 70px;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#goto-settings {
+    left: 190px;
+    top: 2px;
+}
+
+#goto-settings img.settings-icon {
     width: 100px;
-    margin-top: 10px;
-    border-radius: 15px;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
 }
 
-#login-username {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#login-pin {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#signup-username {
-    border-radius: 100px;
-    height: 30px;
-    width: 200px;
-    border-width: 1px;
-    padding-left: 10px;
-}
-
-#signup-btn {
+#goto-collection img.collection-icon {
     width: 100px;
+    height: auto;
+    image-rendering: pixelated;
+    position: fixed;
+    background-color: transparent;
+    left: 100px;
+    bottom: 0;
+}
+
+/* USER DISPLAY */
+#user-display {
     margin-top: 10px;
-    border-radius: 15px;
+    position: fixed;
+    left: 9px;
+    top: 50px;
+    background-color: var(--btn-base-color);
+    color: var(--btn-text-color);
+    padding: 8px 12px;
+    border: none;
+    font-weight: bold;
+    font-size: 0.7rem;
+    font-family: 'Press Start 2P', monospace;
+    box-shadow: 
+        0 0 0 2px var(--btn-dark-color),
+        0 0 0 4px var(--btn-light-color);
+    z-index: 9999;
+}
+
+#user-display #username {
+    text-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 #000;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .header-controls {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    button, .shop-btn {
+        font-size: 0.6rem;
+        padding: 8px 10px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .shop-btn {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .shop-btn-text {
+        text-align: center;
+    }
+    
+    .shop-btn-stock {
+        text-align: center;
+    }
 }

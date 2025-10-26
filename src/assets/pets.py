@@ -4,11 +4,13 @@ level_multiplayer = 1
 
 
 
-common_pets = ["Worm","Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Beetle", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
+common_pets = ["Worm","Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew"]
 
 rare_pets = ["Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal"]
 
-legendary_pets = ["Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon", "Python","Komodo Dragon", "Elephant"]
+legendary_pets = ["Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon","Komodo Dragon", "Elephant"]
+
+prehistoric_pets = ["T-Rex"]
 
 pet_levels = {
     "Worm": 1,
@@ -25,7 +27,6 @@ pet_levels = {
     "Cockroach": 1,
     "Fly": 1,
     "Mosquito": 1,
-    "Beetle": 1,
     "Slug": 1,
     "Centipede": 1,
     "Millipede": 1,
@@ -64,7 +65,7 @@ pet_levels = {
     "Lion": 1,
     "Bear": 1,
     "Falcon": 1,
-    "Python": 1,
+    "T-Rex": 1,
     "Elephant":1,
 }
 
@@ -137,9 +138,11 @@ crocodile_stats = {"attack": 55 * level_multiplayer, "hp": 100 * level_multiplay
 lion_stats = {"attack": 48 * level_multiplayer, "hp": 75 * level_multiplayer, "rarity": 3, "dodge_chance": 4, "class": [4]}
 bear_stats = {"attack": 38 * level_multiplayer, "hp": 120 * level_multiplayer, "rarity": 3, "dodge_chance": 3, "class": [1]}
 falcon_stats = {"attack": 32 * level_multiplayer, "hp": 40 * level_multiplayer, "rarity": 3, "dodge_chance": 25, "class": [5, 3]}
-python_stats = {"attack": 28 * level_multiplayer, "hp": 85 * level_multiplayer, "rarity": 3, "dodge_chance": 9, "class": [1, 2]}
 komodo_dragon_stats = {"attack": 40 * level_multiplayer, "hp": 70 * level_multiplayer, "rarity": 3, "dodge_chance": 2, "class": [2, 4]}
 elephant_stats = {"attack": 30 * level_multiplayer, "hp": 150 * level_multiplayer, "rarity": 3, "dodge_chance": 0, "class": [1]}
+
+#prehistoric
+t_rex_stats = {"attack": 200 * level_multiplayer, "hp": 500 * level_multiplayer, "rarity": 10, "dodge_chance": 15, "class": [1, 4]}
 
 
 
@@ -158,7 +161,6 @@ all_pet_stats = {
     "Cockroach": cockroach_stats,
     "Fly": fly_stats,
     "Mosquito": mosquito_stats,
-    "Beetle": beetle_stats,
     "Slug": slug_stats,
     "Centipede": centipede_stats,
     "Millipede": millipede_stats,
@@ -196,7 +198,7 @@ all_pet_stats = {
     "Lion": lion_stats,
     "Bear": bear_stats,
     "Falcon": falcon_stats,
-    "Python": python_stats,
+    "T-Rex": t_rex_stats,
     "Komodo Dragon": komodo_dragon_stats,
     "Elephant": elephant_stats
 }
@@ -217,7 +219,6 @@ all_pets = [
         "Cockroach",
         "Fly",
         "Mosquito",
-        "Beetle",
         "Slug",
         "Centipede",
         "Millipede",
@@ -255,7 +256,7 @@ all_pets = [
         "Lion",
         "Bear",
         "Falcon",
-        "Python",
+        "T-Rex",
         "Komodo Dragon",
         "Elephant"
         ]
