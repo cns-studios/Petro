@@ -281,6 +281,123 @@ function selectBuff(index) {
 
 
 
+const TIMER_DURATION = 500; 
+
+let timerValue = TIMER_DURATION;
+let timerInterval = null;
+
+
+const timerEl = document.getElementById('timer');
+
+
+function setCookie(name, value, days = 365) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+
+function sendAfkMoney() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('afk-money');
+        console.log('afk-money gesendet');
+    } else {
+        console.error('WebSocket ist nicht verbunden');
+    }
+}
+
+// Timer-Funktion
+function updateTimer() {
+    timerValue--;
+    
+    if (timerEl) {
+        timerEl.textContent = timerValue;
+    }
+    
+ 
+    setCookie('afk_timer_value', timerValue);
+    setCookie('afk_timer_timestamp', Date.now());
+    
+
+    if (timerValue <= 0) {
+        sendAfkMoney();
+        timerValue = TIMER_DURATION; 
+        setCookie('afk_timer_value', timerValue);
+    }
+}
+
+
+function loadTimerFromCookie() {
+    const savedValue = getCookie('afk_timer_value');
+    const savedTimestamp = getCookie('afk_timer_timestamp');
+    
+    if (savedValue !== null && savedTimestamp !== null) {
+        const timeElapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
+        let calculatedValue = parseInt(savedValue) - timeElapsed;
+        
+        
+        while (calculatedValue <= 0) {
+            
+            sendAfkMoney();
+            calculatedValue += TIMER_DURATION;
+        }
+        
+        return calculatedValue;
+    }
+    
+    return TIMER_DURATION;
+}
+
+
+function startTimer() {
+ 
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+    
+   
+    timerValue = loadTimerFromCookie();
+    
+    if (timerEl) {
+        timerEl.textContent = timerValue;
+    }
+    
+
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+
+window.addEventListener('load', () => {
+    startTimer();
+});
+
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+window.addEventListener('beforeunload', () => {
+    setCookie('afk_timer_value', timerValue);
+    setCookie('afk_timer_timestamp', Date.now());
+});
+
+
+
 // Page Navigation
 
 const gotoInvbtn = document.getElementById('goto-inv');
