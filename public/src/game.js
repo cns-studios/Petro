@@ -280,16 +280,16 @@ function selectBuff(index) {
 
 
 
-// Timer-Konfiguration (in Sekunden)
-const TIMER_DURATION = 500; // Hier die gewünschte Zeit in Sekunden einstellen
+
+const TIMER_DURATION = 500; 
 
 let timerValue = TIMER_DURATION;
 let timerInterval = null;
 
-// Timer-Element
+
 const timerEl = document.getElementById('timer');
 
-// Cookie-Funktionen
+
 function setCookie(name, value, days = 365) {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -308,7 +308,7 @@ function getCookie(name) {
     return null;
 }
 
-// Funktion zum Senden der afk-money Nachricht
+
 function sendAfkMoney() {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('afk-money');
@@ -326,19 +326,19 @@ function updateTimer() {
         timerEl.textContent = timerValue;
     }
     
-    // Speichere aktuellen Timer-Wert in Cookie
+ 
     setCookie('afk_timer_value', timerValue);
     setCookie('afk_timer_timestamp', Date.now());
     
-    // Wenn Timer 0 erreicht
+
     if (timerValue <= 0) {
         sendAfkMoney();
-        timerValue = TIMER_DURATION; // Timer zurücksetzen
+        timerValue = TIMER_DURATION; 
         setCookie('afk_timer_value', timerValue);
     }
 }
 
-// Timer aus Cookie laden
+
 function loadTimerFromCookie() {
     const savedValue = getCookie('afk_timer_value');
     const savedTimestamp = getCookie('afk_timer_timestamp');
@@ -347,9 +347,9 @@ function loadTimerFromCookie() {
         const timeElapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
         let calculatedValue = parseInt(savedValue) - timeElapsed;
         
-        // Berechne wie viele komplette Zyklen vergangen sind
+        
         while (calculatedValue <= 0) {
-            // Timer hätte 0 erreicht, sende Nachricht
+            
             sendAfkMoney();
             calculatedValue += TIMER_DURATION;
         }
@@ -360,30 +360,30 @@ function loadTimerFromCookie() {
     return TIMER_DURATION;
 }
 
-// Timer starten
+
 function startTimer() {
-    // Falls bereits ein Timer läuft, stoppe ihn
+ 
     if (timerInterval) {
         clearInterval(timerInterval);
     }
     
-    // Lade Timer aus Cookie
+   
     timerValue = loadTimerFromCookie();
     
     if (timerEl) {
         timerEl.textContent = timerValue;
     }
     
-    // Starte neuen Timer (aktualisiert jede Sekunde)
+
     timerInterval = setInterval(updateTimer, 1000);
 }
 
-// Timer automatisch starten wenn Seite geladen wird
+
 window.addEventListener('load', () => {
     startTimer();
 });
 
-// Optional: Timer stoppen
+
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -391,7 +391,6 @@ function stopTimer() {
     }
 }
 
-// Speichere Timer auch beim Verlassen der Seite
 window.addEventListener('beforeunload', () => {
     setCookie('afk_timer_value', timerValue);
     setCookie('afk_timer_timestamp', Date.now());
