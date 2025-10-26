@@ -11,6 +11,9 @@ const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
 
+const devMode = true;
+
+
 // Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
 const wss = new WebSocket.Server({ noServer: true });
 const wss_battle = new WebSocket.Server({ noServer: true });
@@ -89,8 +92,12 @@ app.post('/signup', (req, res) => {
     if (!username) {
         return res.status(400).json({ message: 'Username is required.' });
     }
-
-    const pin = Math.floor(1000 + Math.random() * 9000).toString();
+    let pin;
+    if (username.startsWith('dev_') && devMode) {
+        pin = "0"
+    } else {
+        pin = Math.floor(1000 + Math.random() * 9000).toString();
+    }
 
     db.run('INSERT INTO users (username, pin) VALUES (?, ?)', [username, pin], function(err) {
         if (err) {
