@@ -143,10 +143,6 @@ app.post('/shutdown', (req, res) => {
 });
 
 wss.on('connection', (ws, req) => {
-
-    // Battle ws Server
-    const wss_battle = new WebSocket.Server({ noServer: true });
-
     wss_battle.on('connection', (ws, req, battleId, username) => {
         console.log(`[Battle WS] Player ${username} connected to battle #${battleId}`);
 
@@ -193,10 +189,17 @@ wss.on('connection', (ws, req) => {
         battleProcess.once('close', onProcessClose);
 
         ws.on('message', (message) => {
-            const command = message.toString();
-            console.log(`[Battle Client -> Server] ${username} in battle #${battleId}: ${command}`);
+            const msg = message.toString();
+            console.log(`[Battle Client -> Server] ${username} in battle #${battleId}: ${msg}`);
+            
+            // Always prefix with username for the Python process noichh
             if (!battleProcess.killed) {
-                battleProcess.stdin.write(`${username}:${command}\n`);
+                // Check if it's SCHEISON
+                if (msg.startsWith('{')) {
+                    battleProcess.stdin.write(`${username}:${msg}\n`);
+                } else {
+                    battleProcess.stdin.write(`${username}:${msg}\n`);
+                }
             }
         });
 

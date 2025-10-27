@@ -47,20 +47,23 @@ function setupPregameUI() {
 function setupPetSelection() {
     const container = document.getElementById('pet-selection-container');
     
-    // Sort pets rarity
-    const sortedInventory = [...userInventory].sort((a, b) => {
+    // Store original index with pet dada
+    const sortedInventory = userInventory.map((pet, index) => ({
+        ...pet,
+        originalIndex: index
+    })).sort((a, b) => {
         const rarityA = RARITY_ORDER[a.rarity?.toLowerCase()] || 999;
         const rarityB = RARITY_ORDER[b.rarity?.toLowerCase()] || 999;
         return rarityA - rarityB;
     });
     
-    container.innerHTML = sortedInventory.map((pet, index) => `
-        <div class="pet-select-card" data-index="${index}" data-pet-id="${pet.id || index}">
+    container.innerHTML = sortedInventory.map(pet => `
+        <div class="pet-select-card" data-index="${pet.originalIndex}">
             <div class="pet-rarity ${pet.rarity?.toLowerCase() || 'common'}">${pet.rarity || 'Common'}</div>
             <strong>${pet.name}</strong>
-            <div>Level: ${pet.level}</div>
+            <div>Level: ${pet.level || 1}</div>
             <div>HP: ${pet.hp} | ATK: ${pet.attack}</div>
-            <div>Dodge: ${pet.dodge_chance}%</div>
+            <div>Dodge: ${pet.dodge_chance || 0}%</div>
         </div>
     `).join('');
     
@@ -141,11 +144,14 @@ function startBattle() {
 }
 
 function connectBattle(battleId, username, pin) {
-    ws = new WebSocket(`ws://${window.location.host}/battle?battleId=${battleId}&username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${window.location.host}/battle?battleId=${battleId}&username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
     
     ws.onopen = () => {
         console.log('Connected to battle');
-        ws.send('get_pregame_data');  // request inventory data first
+        ws.send(JSON.stringify({
+            action: 'get_pregame_data'
+        }));
     };
     
     ws.onmessage = (event) => {

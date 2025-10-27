@@ -222,13 +222,17 @@ class Battle:
     
     def process_command(self, username, command):
         # Try to parse as JSON first
-        try:
-            data = json.loads(command)
-            if data.get('action') == 'select_pets':
-                self.handle_pet_selection(username, data)
-                return
-        except json.JSONDecodeError:
-            pass
+        if command.startswith('{'):
+            try:
+                data = json.loads(command)
+                if data.get('action') == 'get_pregame_data':
+                    self.send_pregame_data(username)
+                    return
+                elif data.get('action') == 'select_pets':
+                    self.handle_pet_selection(username, data)
+                    return
+            except json.JSONDecodeError:
+                pass
         
         # Handle text commands
         parts = command.strip().lower().split()

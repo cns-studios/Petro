@@ -49,3 +49,107 @@ button:active {
         calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color), 
         calc(1 * var(--pixel-size)) calc(1 * var(--pixel-size)) 0 0 var(--btn-base-color);
 }
+
+#pregame {
+    padding: 20px;
+}
+
+#pet-selection-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.pet-select-card {
+    border: 2px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.pet-select-card:hover {
+    background-color: #f0f0f0;
+}
+
+.pet-select-card.selected {
+    border-color: #4CAF50;
+    background-color: #e8f5e9;
+}
+
+#bet-selection-container {
+    margin: 20px 0;
+}
+
+#bet-slider {
+    width: 100%;
+}
+
+#bet-display {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.battle-arena {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.player-section {
+    width: 45%;
+}
+
+.player-section.active {
+    border: 2px solid gold;
+}
+
+.pet-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.pet-card.active {
+    background-color: #fff3cd;
+}
+
+.pet-card.dead {
+    opacity: 0.5;
+}
+
+.hp-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s;
+}
+
+#battle-log {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+#winner-banner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
