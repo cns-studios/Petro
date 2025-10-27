@@ -8,18 +8,54 @@
 </head>
 <body>
     <!-- Pregame -->
-     <div id="pregame" style="display: block;">
+    <div id="pregame" style="display: block;">
         <h1>Choose 3 Pets</h1>
-        <div id="pet-selection-container">
-
+        <div id="pet-selection-container"></div>
+        <div id="selected-pets-display">
+            <p>Selected: <span id="selected-count">0</span>/3</p>
         </div>
+        
         <h1>Choose how much you want to bet for this round</h1>
         <div id="bet-selection-container">
-
+            <input type="range" id="bet-slider" min="0" max="1000" value="0" step="10">
+            <div id="bet-display">
+                <span>Bet Amount: $<span id="bet-amount">0</span></span>
+                <span id="max-bet-display">Max: $0</span>
+            </div>
         </div>
-        <button id="startBattle-btn">Start Battle</button>
-     </div>
+        
+        <button id="startBattle-btn" disabled>Start Battle</button>
+    </div>
+    
     <!-- Ingame -->
+    <div id="ingame" style="display: none;">
+        <!-- PLACEHOLDERSSSS -->
+        <div id="turn-indicator"></div>
+        
+        <div class="battle-arena">
+            <div id="player1-section" class="player-section">
+                <h2 id="player1-name">Player 1</h2>
+                <div id="player1-pets"></div>
+            </div>
+            
+            <div id="player2-section" class="player-section">
+                <h2 id="player2-name">Player 2</h2>
+                <div id="player2-pets"></div>
+            </div>
+        </div>
+        
+        <div id="battle-controls">
+            <button id="attack-btn" onclick="attack()">Attack</button>
+        </div>
+        
+        <div id="battle-log">
+            <h3>Battle Log</h3>
+            <div id="log-messages"></div>
+        </div>
+        
+        <div id="winner-banner" style="display: none;"></div>
+    </div>
+    
     <!-- Postgame -->
     <!-- Others --> 
 </body>
