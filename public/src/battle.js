@@ -34,29 +34,9 @@ window.addEventListener('DOMContentLoaded', () => {
     currentUsername = params.username;
     currentPin = params.pin;
     
-    // fetching user data first (W)
-    fetchUserData(params.username).then(() => {
-        setupPregameUI();
-        connectBattle(params.battleId, params.username, params.pin);
-    });
+    // Connect => data via ws
+    connectBattle(params.battleId, params.username, params.pin);
 });
-
-async function fetchUserData(username) {
-    try {
-        const response = await fetch(`/api/user-data?username=${encodeURIComponent(username)}`);
-        const data = await response.json();
-        
-        if (data.inventory) {
-            userInventory = data.inventory;
-            userMoney = data.money || 0;
-        }
-    } catch (e) {
-        console.error('Failed to fetch user data:', e);
-        // Fallback to default values (L)
-        userInventory = [];
-        userMoney = 0;
-    }
-}
 
 function setupPregameUI() {
     setupPetSelection();
@@ -165,15 +145,19 @@ function connectBattle(battleId, username, pin) {
     
     ws.onopen = () => {
         console.log('Connected to battle');
-        ws.send('get_state');
+        ws.send('get_pregame_data');  // request inventory data first
     };
     
     ws.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
             console.log('Battle update:', data);
-            
-            if (data.type === 'battle_state') {
+            if (data.type === 'pregame_data') {
+                // Received inventory dada
+                userInventory = data.inventory || [];
+                userMoney = data.money || 0;
+                setupPregameUI();
+            } else if (data.type === 'battle_state') {
                 battleState = data;
                 
                 if (data.phase === 'pregame') {

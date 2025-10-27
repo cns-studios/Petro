@@ -34,6 +34,17 @@ class Battle:
         self.p1_active = 0
         self.p2_active = 0
         self.winner = None
+
+    def send_pregame_data(self, username):
+        state = self.p1_state if username == self.player1_name else self.p2_state
+        inventory = state.get('inventory', [])
+        money = state.get('money', 0)
+        
+        self.send_json({
+            'type': 'pregame_data',
+            'inventory': inventory,
+            'money': money
+        })
         
     def get_state(self, message=""):
         if self.phase == 'pregame':
@@ -225,6 +236,8 @@ class Battle:
         
         if action == "get_state":
             self.send_state("Battle state")
+        elif action == "get_pregame_data":
+            self.send_pregame_data(username)
         elif action == "attack":
             self.execute_attack(username)
         elif action == "switch":
