@@ -1,6 +1,17 @@
 let ws;
 let currentUsername;
+let currentPin;
 let battleState = null;
+let userInventory = [];
+let userMoney = 0;
+let selectedPets = [];
+let selectedBet = 0;
+
+const RARITY_ORDER = {
+    'common': 1,
+    'rare': 2,
+    'legendary': 3
+};
 
 function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
@@ -21,8 +32,133 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     currentUsername = params.username;
-    connectBattle(params.battleId, params.username, params.pin);
+    currentPin = params.pin;
+    
+    // fetching user data first (W)
+    fetchUserData(params.username).then(() => {
+        setupPregameUI();
+        connectBattle(params.battleId, params.username, params.pin);
+    });
 });
+
+async function fetchUserData(username) {
+    try {
+        const response = await fetch(`/api/user-data?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+        
+        if (data.inventory) {
+            userInventory = data.inventory;
+            userMoney = data.money || 0;
+        }
+    } catch (e) {
+        console.error('Failed to fetch user data:', e);
+        // Fallback to default values (L)
+        userInventory = [];
+        userMoney = 0;
+    }
+}
+
+function setupPregameUI() {
+    setupPetSelection();
+    setupBetSelection();
+    setupStartButton();
+}
+
+function setupPetSelection() {
+    const container = document.getElementById('pet-selection-container');
+    
+    // Sort pets rarity
+    const sortedInventory = [...userInventory].sort((a, b) => {
+        const rarityA = RARITY_ORDER[a.rarity?.toLowerCase()] || 999;
+        const rarityB = RARITY_ORDER[b.rarity?.toLowerCase()] || 999;
+        return rarityA - rarityB;
+    });
+    
+    container.innerHTML = sortedInventory.map((pet, index) => `
+        <div class="pet-select-card" data-index="${index}" data-pet-id="${pet.id || index}">
+            <div class="pet-rarity ${pet.rarity?.toLowerCase() || 'common'}">${pet.rarity || 'Common'}</div>
+            <strong>${pet.name}</strong>
+            <div>Level: ${pet.level}</div>
+            <div>HP: ${pet.hp} | ATK: ${pet.attack}</div>
+            <div>Dodge: ${pet.dodge_chance}%</div>
+        </div>
+    `).join('');
+    
+    const cards = container.querySelectorAll('.pet-select-card');
+    cards.forEach(card => {
+        card.addEventListener('click', () => togglePetSelection(card));
+    });
+}
+
+function togglePetSelection(card) {
+    const petId = card.dataset.petId;
+    const index = selectedPets.indexOf(petId);
+    
+    if (index > -1) {
+        // Desel
+        selectedPets.splice(index, 1);
+        card.classList.remove('selected');
+    } else {
+        // Sel
+        if (selectedPets.length < 3) {
+            selectedPets.push(petId);
+            card.classList.add('selected');
+        } else {
+            alert('You can only select 3 pets!');
+        }
+    }
+    
+    updateSelectedCount();
+    updateStartButton();
+}
+
+function updateSelectedCount() {
+    document.getElementById('selected-count').textContent = selectedPets.length;
+}
+
+function setupBetSelection() {
+    const slider = document.getElementById('bet-slider');
+    const betAmount = document.getElementById('bet-amount');
+    const maxBetDisplay = document.getElementById('max-bet-display');
+    
+    slider.max = userMoney;
+    maxBetDisplay.textContent = `Max: $${userMoney}`;
+    
+    slider.addEventListener('input', (e) => {
+        selectedBet = parseInt(e.target.value);
+        betAmount.textContent = selectedBet;
+    });
+}
+
+function setupStartButton() {
+    const startBtn = document.getElementById('startBattle-btn');
+    startBtn.addEventListener('click', () => {
+        if (selectedPets.length === 3) {
+            startBattle();
+        }
+    });
+}
+
+function updateStartButton() {
+    const startBtn = document.getElementById('startBattle-btn');
+    startBtn.disabled = selectedPets.length !== 3;
+}
+
+function startBattle() {
+    // Get pet objects from inventory
+    const selectedPetData = selectedPets.map(petId => {
+        return userInventory[parseInt(petId)];
+    });
+    
+    // Send selection to da damnn server
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            action: 'select_pets',
+            pets: selectedPetData,
+            bet: selectedBet
+        }));
+    }
+}
 
 function connectBattle(battleId, username, pin) {
     ws = new WebSocket(`ws://${window.location.host}/battle?battleId=${battleId}&username=${encodeURIComponent(username)}&pin=${encodeURIComponent(pin)}`);
@@ -39,7 +175,25 @@ function connectBattle(battleId, username, pin) {
             
             if (data.type === 'battle_state') {
                 battleState = data;
-                updateBattleUI(data);
+                
+                if (data.phase === 'pregame') {
+                    // Still in pregameeee
+                    if (data.waiting_for) {
+                        document.getElementById('pregame').innerHTML += 
+                            `<p>Waiting for ${data.waiting_for} to select pets...</p>`;
+                    }
+                } else if (data.phase === 'battle' || !data.phase) {
+                    // Battle start
+                    document.getElementById('pregame').style.display = 'none';
+                    document.getElementById('ingame').style.display = 'block';
+                    updateBattleUI(data);
+                }
+            } else if (data.type === 'selection_confirmed') {
+                document.getElementById('startBattle-btn').disabled = true;
+                document.getElementById('startBattle-btn').textContent = 'Waiting for opponent...';
+            } else if (data.type === 'battle_start') {
+                document.getElementById('pregame').style.display = 'none';
+                document.getElementById('ingame').style.display = 'block';
             } else if (data.type === 'battle_ended') {
                 setTimeout(() => {
                     window.location.href = '/game';
@@ -62,8 +216,6 @@ function connectBattle(battleId, username, pin) {
 }
 
 function updateBattleUI(state) {
-    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
-
     // turn indicator
     const turnIndicator = document.getElementById('turn-indicator');
     const isMyTurn = state.current_turn === currentUsername;
@@ -95,8 +247,6 @@ function updateBattleUI(state) {
 }
 
 function updatePets(elementId, pets, activeIndex) {
-    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
-
     const container = document.getElementById(elementId);
     container.innerHTML = pets.map((pet, index) => {
         const hpPercent = (pet.hp / pet.max_hp) * 100;
@@ -114,8 +264,6 @@ function updatePets(elementId, pets, activeIndex) {
 }
 
 function attack() {
-    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
-
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('attack');
     }
