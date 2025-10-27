@@ -1,90 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --btn-base-color: #582630;
+  --btn-light-color: #92612a;
+  --btn-dark-color: #702131;
+  --btn-text-color: #d1842b;
+  --bg-primary: #0a0e27;
+  --bg-secondary: #582630;
+  --accent-gold: #d1842b;
+  --pixel-size: 2px;
+  --border-size: 3px;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #1a1a2e;
-    color: #eee;
-}
-.battle-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-.player-section {
-    border: 2px solid #444;
-    padding: 15px;
-    border-radius: 8px;
-    background: #16213e;
-}
-.player-section.active {
-    border-color: #0f0;
-}
-.pet-card {
-    background: #0f3460;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-}
-.pet-card.active {
-    border: 2px solid #ff0;
-}
-.pet-card.dead {
-    opacity: 0.5;
-    background: #333;
-}
-.hp-bar {
-    width: 100%;
-    height: 20px;
-    background: #555;
-    border-radius: 10px;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
-    margin-top: 5px;
+    background: rgb(20, 20, 20);
+    font-family: 'Press Start 2P', monospace;
 }
-.hp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #f00, #0f0);
-    transition: width 0.3s;
-}
-.battle-log {
-    background: #16213e;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-.controls {
-    margin-top: 20px;
-    text-align: center;
-}
+
+/* Buttons */
+
 button {
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    background: #e94560;
-    color: white;
+    padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    background-color: var(--btn-base-color);
+    color: var(--btn-text-color);
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    transition: all 0.05s linear;
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-light-color),
+        var(--pixel-size) var(--pixel-size) 0 0 var(--btn-dark-color),
+        calc(-2 * var(--pixel-size)) calc(-2 * var(--pixel-size)) 0 0 var(--btn-dark-color),
+        calc(2 * var(--pixel-size)) calc(2 * var(--pixel-size)) 0 0 var(--btn-base-color);
 }
+
 button:hover {
-    background: #c23a52;
+    background-color: var(--btn-light-color);
+    transform: translate(0, calc(-1 * var(--pixel-size)));
 }
-button:disabled {
-    background: #555;
-    cursor: not-allowed;
-}
-.winner-banner {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
-    padding: 40px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 32px;
-    color: #ffd700;
-    display: none;
+
+button:active {
+    transform: translate(var(--pixel-size), var(--pixel-size));
+    box-shadow: 
+        calc(-1 * var(--pixel-size)) calc(-1 * var(--pixel-size)) 0 0 var(--btn-dark-color), 
+        calc(1 * var(--pixel-size)) calc(1 * var(--pixel-size)) 0 0 var(--btn-base-color);
 }

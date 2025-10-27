@@ -62,6 +62,8 @@ function connectBattle(battleId, username, pin) {
 }
 
 function updateBattleUI(state) {
+    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
+
     // turn indicator
     const turnIndicator = document.getElementById('turn-indicator');
     const isMyTurn = state.current_turn === currentUsername;
@@ -93,6 +95,8 @@ function updateBattleUI(state) {
 }
 
 function updatePets(elementId, pets, activeIndex) {
+    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
+
     const container = document.getElementById(elementId);
     container.innerHTML = pets.map((pet, index) => {
         const hpPercent = (pet.hp / pet.max_hp) * 100;
@@ -110,6 +114,8 @@ function updatePets(elementId, pets, activeIndex) {
 }
 
 function attack() {
+    // THE FOLLOWING ARE PLACEHOLDERS AND SHOULD BE REPLACED SOON
+
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('attack');
     }
