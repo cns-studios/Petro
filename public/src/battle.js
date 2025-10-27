@@ -47,25 +47,37 @@ function setupPregameUI() {
 function setupPetSelection() {
     const container = document.getElementById('pet-selection-container');
     
-    // Store original index with pet dada
+    // Sort pets by rarity - handle missing/invalid rarity values
     const sortedInventory = userInventory.map((pet, index) => ({
         ...pet,
-        originalIndex: index
+        originalIndex: index,
+        rarity: (pet.rarity || 'common').toString().toLowerCase()
     })).sort((a, b) => {
-        const rarityA = RARITY_ORDER[a.rarity?.toLowerCase()] || 999;
-        const rarityB = RARITY_ORDER[b.rarity?.toLowerCase()] || 999;
+        const rarityA = RARITY_ORDER[a.rarity] || 999;
+        const rarityB = RARITY_ORDER[b.rarity] || 999;
         return rarityA - rarityB;
     });
     
-    container.innerHTML = sortedInventory.map(pet => `
-        <div class="pet-select-card" data-index="${pet.originalIndex}">
-            <div class="pet-rarity ${pet.rarity?.toLowerCase() || 'common'}">${pet.rarity || 'Common'}</div>
-            <strong>${pet.name}</strong>
-            <div>Level: ${pet.level || 1}</div>
-            <div>HP: ${pet.hp} | ATK: ${pet.attack}</div>
-            <div>Dodge: ${pet.dodge_chance || 0}%</div>
-        </div>
-    `).join('');
+    container.innerHTML = sortedInventory.map(pet => {
+        // Safely handle all pet properties lol
+        const name = pet.name || 'Unknown Pet';
+        const level = pet.level || 1;
+        const hp = pet.hp || 0;
+        const attack = pet.attack || 0;
+        const dodgeChance = pet.dodge_chance || 0;
+        const rarityClass = pet.rarity || 'common';
+        const rarityDisplay = rarityClass.charAt(0).toUpperCase() + rarityClass.slice(1);
+        
+        return `
+            <div class="pet-select-card" data-index="${pet.originalIndex}">
+                <div class="pet-rarity ${rarityClass}">${rarityDisplay}</div>
+                <strong>${name}</strong>
+                <div>Level: ${level}</div>
+                <div>HP: ${hp} | ATK: ${attack}</div>
+                <div>Dodge: ${dodgeChance}%</div>
+            </div>
+        `;
+    }).join('');
     
     const cards = container.querySelectorAll('.pet-select-card');
     cards.forEach(card => {
@@ -74,17 +86,18 @@ function setupPetSelection() {
 }
 
 function togglePetSelection(card) {
-    const petId = card.dataset.petId;
-    const index = selectedPets.indexOf(petId);
+    const petIndex = card.dataset.index;
+    const indexStr = petIndex.toString();
+    const arrayIndex = selectedPets.indexOf(indexStr);
     
-    if (index > -1) {
-        // Desel
-        selectedPets.splice(index, 1);
+    if (arrayIndex > -1) {
+        // Des
+        selectedPets.splice(arrayIndex, 1);
         card.classList.remove('selected');
     } else {
         // Sel
         if (selectedPets.length < 3) {
-            selectedPets.push(petId);
+            selectedPets.push(indexStr);
             card.classList.add('selected');
         } else {
             alert('You can only select 3 pets!');
@@ -127,13 +140,29 @@ function updateStartButton() {
     startBtn.disabled = selectedPets.length !== 3;
 }
 
+
 function startBattle() {
-    // Get pet objects from inventory
-    const selectedPetData = selectedPets.map(petId => {
-        return userInventory[parseInt(petId)];
-    });
+    const selectedPetData = selectedPets.map(petIndex => {
+        const pet = userInventory[parseInt(petIndex)];
+        if (!pet) {
+            console.error(`Pet at index ${petIndex} not found`);
+            return null;
+        }
+        return {
+            name: pet.name || 'Unknown Pet',
+            hp: pet.hp || 100,
+            attack: pet.attack || 10,
+            dodge_chance: pet.dodge_chance || 0,
+            level: pet.level || 1,
+            rarity: pet.rarity || 'common'
+        };
+    }).filter(pet => pet !== null);
     
-    // Send selection to da damnn server
+    if (selectedPetData.length !== 3) {
+        alert('Please select exactly 3 valid pets');
+        return;
+    }
+    
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
             action: 'select_pets',
@@ -149,31 +178,40 @@ function connectBattle(battleId, username, pin) {
     
     ws.onopen = () => {
         console.log('Connected to battle');
-        ws.send(JSON.stringify({
-            action: 'get_pregame_data'
-        }));
+        ws.send('get_pregame_data');  // Send as simple string
     };
     
     ws.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
             console.log('Battle update:', data);
+            
             if (data.type === 'pregame_data') {
-                // Received inventory dada
-                userInventory = data.inventory || [];
-                userMoney = data.money || 0;
+                // Validate and clean inventory data
+                userInventory = (data.inventory || []).map(pet => ({
+                    name: pet.name || 'Unknown',
+                    hp: parseInt(pet.hp) || 100,
+                    attack: parseInt(pet.attack) || 10,
+                    dodge_chance: parseInt(pet.dodge_chance) || 0,
+                    level: parseInt(pet.level) || 1,
+                    rarity: (pet.rarity || 'common').toString().toLowerCase()
+                }));
+                userMoney = parseInt(data.money) || 0;
                 setupPregameUI();
             } else if (data.type === 'battle_state') {
                 battleState = data;
                 
                 if (data.phase === 'pregame') {
-                    // Still in pregameeee
                     if (data.waiting_for) {
-                        document.getElementById('pregame').innerHTML += 
-                            `<p>Waiting for ${data.waiting_for} to select pets...</p>`;
+                        const waitingDiv = document.getElementById('waiting-message');
+                        if (!waitingDiv) {
+                            const div = document.createElement('div');
+                            div.id = 'waiting-message';
+                            div.innerHTML = `<p>Waiting for ${data.waiting_for} to select pets...</p>`;
+                            document.getElementById('pregame').appendChild(div);
+                        }
                     }
-                } else if (data.phase === 'battle' || !data.phase) {
-                    // Battle start
+                } else if (data.phase === 'battle') {
                     document.getElementById('pregame').style.display = 'none';
                     document.getElementById('ingame').style.display = 'block';
                     updateBattleUI(data);
@@ -193,6 +231,7 @@ function connectBattle(battleId, username, pin) {
             }
         } catch (e) {
             console.error('Failed to parse battle data:', e);
+            console.error('Raw data:', event.data);
         }
     };
     

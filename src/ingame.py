@@ -103,19 +103,25 @@ class Battle:
             pets_data = data.get('pets', [])
             bet = data.get('bet', 0)
             
-            # Convert pets for da battle format
+            # Convert pets for battle format with validation
             pets = []
             for pet_data in pets_data[:3]:  # max 3 pets
+                # Ensure all fields have default values
                 pets.append({
-                    'name': pet_data['name'],
-                    'hp': pet_data['hp'],
-                    'max_hp': pet_data['hp'],
-                    'attack': pet_data['attack'],
-                    'dodge_chance': pet_data.get('dodge_chance', 0),
-                    'level': pet_data.get('level', 1),
+                    'name': pet_data.get('name', 'Unknown Pet'),
+                    'hp': int(pet_data.get('hp', 100)),
+                    'max_hp': int(pet_data.get('hp', 100)),
+                    'attack': int(pet_data.get('attack', 10)),
+                    'dodge_chance': int(pet_data.get('dodge_chance', 0)),
+                    'level': int(pet_data.get('level', 1)),
+                    'rarity': str(pet_data.get('rarity', 'common')).lower(),
                     'alive': True
                 })
             
+            if len(pets) < 3:
+                self.send_error(f"Need exactly 3 pets, got {len(pets)}")
+                return
+                
             if username == self.player1_name:
                 self.player1_pets = pets
                 self.player1_bet = bet
