@@ -726,7 +726,7 @@ header h1 {
 
 #goto-settings {
     left: 190px;
-    top: 2px;
+    top: -20px;
 }
 
 #goto-settings img.settings-icon {
@@ -806,5 +806,38 @@ header h1 {
     
     .shop-btn-stock {
         text-align: center;
+    }
+}
+
+#play-btn {  
+    font-size: 80px;
+    bottom: 10px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 20px 40px;
+}
+
+#play-btn:hover {
+    background-color: var(--btn-light-color);
+    transform: translateX(-50%) translate(0, calc(-1 * var(--pixel-size)));
+}
+
+#pet-of-the-day-container {
+    position: fixed;
+    top: 30%;
+    right: 42%;
+}
+
+#pet_of_the_day {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
     }
 }

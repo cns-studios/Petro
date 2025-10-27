@@ -63,9 +63,9 @@ const shopCpEl = document.getElementById('shop-cp');
 const shopLupEl = document.getElementById('shop-lup');
 const rerollPriceEl = document.getElementById('reroll-price');
 const playBtn = document.getElementById('play-btn');
-
 const buffSelectionModal = document.getElementById('buff-selection');
 const buffChoicesEl = document.getElementById('buff-choices');
+const all_pets = ["Worm","Ant", "Rat", "Snail", "Spider", "Bee", "Stag Beetle", "Grasshopper", "Ladybug", "Butterfly", "Moth", "Cockroach", "Fly", "Mosquito", "Slug", "Centipede", "Millipede", "Earwig", "Pill Bug", "Springtail", "Aphid", "Caterpillar", "Maggot", "Tick", "Flea", "Hamster", "Mouse", "Shrew", "Cat", "Raccoon", "Peregrine Falcon", "Red Fox", "Lynx", "Otter", "Hawk", "Owl", "Raven", "Cobra", "Monitor Lizard", "Badger", "Wolverine", "Jackal", "Anaconda", "Tiger", "Wolf", "Eagle", "Shark", "Crocodile", "Lion", "Bear", "Falcon","Komodo Dragon", "Elephant", "T-Rex"];
 
 const BUFF_DESCRIPTIONS = {
     1: "+1 Attack for all Pets",
@@ -397,6 +397,41 @@ window.addEventListener('beforeunload', () => {
 });
 
 
+const TIMEZONE_OFFSET_HOURS = 1;
+const ROTATION_INTERVAL_HOURS = 24;
+
+function getPetOfTheDay() {
+    const now = new Date();
+    const millisPerInterval = ROTATION_INTERVAL_HOURS * 60 * 60 * 1000;
+    const timezoneOffset = TIMEZONE_OFFSET_HOURS * 60 * 60 * 1000;
+    const adjustedTime = now.getTime() + timezoneOffset;
+    const intervalsSinceEpoch = Math.floor(adjustedTime / millisPerInterval);
+    const index = intervalsSinceEpoch % all_pets.length;
+    return all_pets[index];
+}
+
+// Pet of the Day Display
+function displayPetOfTheDay() {
+    const pet_of_the_day = getPetOfTheDay();
+    const imgEl = document.getElementById('pet_of_the_day');
+    const nameEl = document.getElementById('pet-of-the-day-name');
+    
+    if (imgEl && nameEl) {
+        imgEl.src = `/images/${pet_of_the_day}.png`;
+        imgEl.alt = pet_of_the_day;
+        
+    }
+}
+
+
+displayPetOfTheDay();
+
+
+
+
+
+
+
 
 // Page Navigation
 
@@ -404,6 +439,7 @@ const gotoInvbtn = document.getElementById('goto-inv');
 const gotoShopbtn = document.getElementById('goto-shop');
 const gotoSettingsbtn = document.getElementById('goto-settings');
 const gotoHomebtn = document.getElementById('goto-home');
+const playbtn = document.getElementById('play-btn');
 
 const homePage = document.getElementById('home');
 const invPage = document.getElementById('inv');
@@ -411,13 +447,20 @@ const shopPage = document.getElementById('shop');
 const settingsPage = document.getElementById('settings');
 const collectionPage = document.getElementById('collection');
 
+
+
+
 gotoHomebtn.style.display = 'none';
 
 invPage.style.display = 'none';
 shopPage.style.display = 'none';
 settingsPage.style.display = 'none';
 
+playbtn.style.display = 'block';
+
 gotoHomebtn.addEventListener('click', () => {
+    playbtn.style.display = 'block';
+
     homePage.style.display = 'block';
     gotoHomebtn.style.display = 'none';
 
@@ -429,6 +472,8 @@ gotoHomebtn.addEventListener('click', () => {
     shopPage.style.display = 'none';
     settingsPage.style.display = 'none';
     collectionPage.style.display = 'none';
+
+    
 });
 
 gotoInvbtn.addEventListener('click', () => {
@@ -439,6 +484,8 @@ gotoInvbtn.addEventListener('click', () => {
 
     gotoShopbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
+
+    playbtn.style.display = 'none';
 });
 
 gotoShopbtn.addEventListener('click', () => {
@@ -449,6 +496,8 @@ gotoShopbtn.addEventListener('click', () => {
 
     gotoShopbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
+
+    playbtn.style.display = 'none';
 });
 
 gotoSettingsbtn.addEventListener('click', () => {
@@ -460,4 +509,6 @@ gotoSettingsbtn.addEventListener('click', () => {
     gotoShopbtn.style.display = 'none';
     gotoSettingsbtn.style.display = 'none';
     gotoInvbtn.style.display = 'none';
+
+    playbtn.style.display = 'none';
 });
