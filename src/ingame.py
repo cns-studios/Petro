@@ -5,74 +5,72 @@ import time
 from logic import pull_state
 
 class Battle:
-
-    # TEMPORARY GAME FOR DEBUGGING BJARNE!11!1!!!!
-
     def __init__(self, battle_id, player1_name, player2_name):
         self.battle_id = battle_id
         self.player1_name = player1_name
         self.player2_name = player2_name
         
-        # Load player inventories
-        p1_state = pull_state(player1_name)
-        p2_state = pull_state(player2_name)
+        # Load player states
+        self.p1_state = pull_state(player1_name)
+        self.p2_state = pull_state(player2_name)
         
-        if not p1_state or not p2_state:
+        if not self.p1_state or not self.p2_state:
             self.send_error("Failed to load player data")
             sys.exit(1)
         
-        # Get first 3 pets from each player's inventory
-        self.player1_pets = self.load_pets(p1_state)
-        self.player2_pets = self.load_pets(p2_state)
+        # Pregame phase
+        self.phase = 'pregame'
+        self.player1_ready = False
+        self.player2_ready = False
+        self.player1_pets = []
+        self.player2_pets = []
+        self.player1_bet = 0
+        self.player2_bet = 0
         
+        # Battle state
         self.current_turn = player1_name
         self.turn_number = 1
         self.battle_log = []
-        
-        # Current active pets (index)
         self.p1_active = 0
         self.p2_active = 0
-        
         self.winner = None
         
-    def load_pets(self, state):
-        pets = []
-        inventory = state.get('inventory', [])[:3]
-        
-        for pet_data in inventory:
-            pets.append({
-                'name': pet_data['name'],
-                'hp': pet_data['hp'],
-                'max_hp': pet_data['hp'],
-                'attack': pet_data['attack'],
-                'dodge_chance': pet_data['dodge_chance'],
-                'level': pet_data['level'],
-                'alive': True
-            })
-        
-        return pets
-    
     def get_state(self, message=""):
-        """Return current state"""
-        return {
-            'type': 'battle_state',
-            'battle_id': self.battle_id,
-            'player1': {
-                'name': self.player1_name,
-                'pets': self.player1_pets,
-                'active_pet': self.p1_active
-            },
-            'player2': {
-                'name': self.player2_name,
-                'pets': self.player2_pets,
-                'active_pet': self.p2_active
-            },
-            'current_turn': self.current_turn,
-            'turn_number': self.turn_number,
-            'battle_log': self.battle_log[-5:],
-            'message': message,
-            'winner': self.winner
-        }
+        if self.phase == 'pregame':
+            waiting_for = []
+            if not self.player1_ready:
+                waiting_for.append(self.player1_name)
+            if not self.player2_ready:
+                waiting_for.append(self.player2_name)
+                
+            return {
+                'type': 'battle_state',
+                'phase': 'pregame',
+                'battle_id': self.battle_id,
+                'waiting_for': ', '.join(waiting_for) if waiting_for else None,
+                'message': message
+            }
+        else:
+            return {
+                'type': 'battle_state',
+                'phase': 'battle',
+                'battle_id': self.battle_id,
+                'player1': {
+                    'name': self.player1_name,
+                    'pets': self.player1_pets,
+                    'active_pet': self.p1_active
+                },
+                'player2': {
+                    'name': self.player2_name,
+                    'pets': self.player2_pets,
+                    'active_pet': self.p2_active
+                },
+                'current_turn': self.current_turn,
+                'turn_number': self.turn_number,
+                'battle_log': self.battle_log[-5:],
+                'message': message,
+                'winner': self.winner
+            }
     
     def send_state(self, message=""):
         print(json.dumps(self.get_state(message)))
@@ -82,8 +80,56 @@ class Battle:
         print(json.dumps({'type': 'error', 'message': error_msg}))
         sys.stdout.flush()
     
+    def send_json(self, data):
+        print(json.dumps(data))
+        sys.stdout.flush()
+    
     def add_log(self, message):
         self.battle_log.append(f"Turn {self.turn_number}: {message}")
+    
+    def handle_pet_selection(self, username, data):
+        try:
+            pets_data = data.get('pets', [])
+            bet = data.get('bet', 0)
+            
+            # Convert pets for da battle format
+            pets = []
+            for pet_data in pets_data[:3]:  # max 3 pets
+                pets.append({
+                    'name': pet_data['name'],
+                    'hp': pet_data['hp'],
+                    'max_hp': pet_data['hp'],
+                    'attack': pet_data['attack'],
+                    'dodge_chance': pet_data.get('dodge_chance', 0),
+                    'level': pet_data.get('level', 1),
+                    'alive': True
+                })
+            
+            if username == self.player1_name:
+                self.player1_pets = pets
+                self.player1_bet = bet
+                self.player1_ready = True
+            else:
+                self.player2_pets = pets
+                self.player2_bet = bet
+                self.player2_ready = True
+            
+            self.send_json({
+                'type': 'selection_confirmed',
+                'message': f'{username} is ready'
+            })
+            
+            if self.player1_ready and self.player2_ready:
+                self.start_battle()
+        except Exception as e:
+            self.send_error(f"Failed to process selection: {str(e)}")
+    
+    def start_battle(self):
+        """Start the actual battle"""
+        self.phase = 'battle'
+        self.add_log(f"Battle started! {self.player1_name} vs {self.player2_name}")
+        self.send_json({'type': 'battle_start'})
+        self.send_state("Battle has begun!")
     
     def get_active_pet(self, player):
         """Get the current active pet for a player"""
@@ -122,6 +168,10 @@ class Battle:
         return False
     
     def execute_attack(self, attacker_name):
+        if self.phase != 'battle':
+            self.send_error("Battle hasn't started yet!")
+            return
+            
         if attacker_name != self.current_turn:
             self.send_state("Not your turn!")
             return
@@ -153,18 +203,28 @@ class Battle:
                         self.send_state(f"{self.winner} is victorious!")
                         return
         
-        # swutch turns
+        # Switch turns
         self.current_turn = self.player2_name if self.current_turn == self.player1_name else self.player1_name
         self.turn_number += 1
         
         self.send_state(f"{self.current_turn}'s turn")
     
     def process_command(self, username, command):
+        # Try to parse as JSON first
+        try:
+            data = json.loads(command)
+            if data.get('action') == 'select_pets':
+                self.handle_pet_selection(username, data)
+                return
+        except json.JSONDecodeError:
+            pass
+        
+        # Handle text commands
         parts = command.strip().lower().split()
         action = parts[0] if parts else ""
         
         if action == "get_state":
-            self.send_state("Battle in progress")
+            self.send_state("Battle state")
         elif action == "attack":
             self.execute_attack(username)
         elif action == "switch":
@@ -196,7 +256,7 @@ if __name__ == "__main__":
     player2 = sys.argv[3]
     
     battle = Battle(battle_id, player1, player2)
-    battle.send_state(f"Battle started! {player1} vs {player2}")
+    battle.send_state(f"[Ingame] Battle lobby created! {player1} vs {player2}")
     
     try:
         for line in sys.stdin:
