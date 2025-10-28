@@ -6,12 +6,19 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 const fs = require('fs')
+const dotenv = require('dotenv');
+dotenv.config();
 
 const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
 
-const devMode = true;
+try {
+    global.DevMode = process.env.DEV_MODE;
+    console.log(`[Server] Dev mode: ${DevMode}`);
+} catch (error) {
+    global.DevMode = false;
+}
 
 
 // Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
@@ -92,12 +99,8 @@ app.post('/signup', (req, res) => {
     if (!username) {
         return res.status(400).json({ message: 'Username is required.' });
     }
-    let pin;
-    if (username.startsWith('dev_') && devMode) {
-        pin = "0"
-    } else {
-        pin = Math.floor(1000 + Math.random() * 9000).toString();
-    }
+
+    const pin = Math.floor(1000 + Math.random() * 9000).toString();
 
     db.run('INSERT INTO users (username, pin) VALUES (?, ?)', [username, pin], function(err) {
         if (err) {
@@ -111,7 +114,24 @@ app.post('/signup', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, pin } = req.body;
-    if (!username || !pin) {
+    if (DevMode && username === 'dev') {
+        try {
+            db.run("UPDATE users SET game_state = NULL WHERE username = 'dev'",  (err) => {
+                if (err) {
+                    console.error('Login error:', err.message);
+                }
+                console.log(`[Server] User logged in: ${username}`);
+            });
+        } catch {
+            db.run("INSERT INTO users (username, pin) VALUES ('dev', '')", function(err) {
+                if (err) {
+                    console.error('Signup error:', err.message);
+                }
+                console.log(`[Server] New user created: ${username}`);
+            });
+        }
+    } 
+    else if (!username || !pin) {
         return res.status(400).json({ message: 'Username and PIN are required.' });
     }
 
@@ -122,11 +142,12 @@ app.post('/login', (req, res) => {
         }
         if (row) {
             console.log(`[Server] User logged in: ${username}`);
-            res.status(200).json({ message: 'Login successful.' });
+            return res.status(200).json({ message: 'Login successful.' });
         } else {
-            res.status(401).json({ message: 'Invalid username or PIN.' });
+            return res.status(401).json({ message: 'Invalid username or PIN.' });
         }
     });
+    
 });
 
 app.post('/shutdown', (req, res) => {
