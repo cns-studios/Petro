@@ -103,23 +103,7 @@ function createGameProcess(username) {
     return gameProcess;
 }
 
-async function checkGemini(username) {
-    try {
-        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        const prompt = "Please respond in one word only if this username is supposed to be banned only check if there are any insultwords or pedophilia words or any other words or sentences that are bad. If it is not banned respond with 'no' if it is banned respond with 'yes'"
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-        console.log(`Gemini check for ${username}: ${text}`);
-        
-    } catch (error) {
-        console.error('Signup Gemini check error:', error.message);
-        console.log(`Cannot check Gemini for ${username}`);
-        console.log(`Continuing anyway`);
-    }
-}
-
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
     const { username } = req.body;
     if (!username) {
         return res.status(400).json({ message: 'Username is required.' });
@@ -140,8 +124,6 @@ app.post('/signup', (req, res) => {
             return res.status(400).json({ message: 'Username must only contain letters and numbers.' });
         }
     }
-    
-    //checkGemini(username);
 
     let pin;
     if (username.startsWith('dev_') && devMode) {

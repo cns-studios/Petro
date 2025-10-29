@@ -1,0 +1,7 @@
+#All names are banned if it includes any of the following words
+snapchat
+admin
+test
+owner
+owner
+test
