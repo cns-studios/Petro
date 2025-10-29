@@ -1,3 +1,4 @@
+import time
 import sys
 import json
 import random
@@ -6,6 +7,16 @@ import os
 import copy
 from assets.pets import all_pet_stats as global_pet_stats, common_pets as global_common_pets, prehistoric_pets as global_prehistoric_pets, rare_pets as global_rare_pets, legendary_pets as global_legendary_pets, pet_levels as global_pet_levels, all_pets
 from logic import pull_state, push_state
+
+
+
+
+
+def afk_money():
+    while True:
+        money += 3
+        time.sleep(1)
+
 class Game:
     def __init__(self, username):
         self.username = username
@@ -33,6 +44,7 @@ class Game:
             self.pending_buff_choices = state.get('pending_buff_choices', [])
             
             available_pets = state.get('available_pets', {})
+        
             if available_pets:
                 self.available_common_pets = available_pets.get('common', global_common_pets.copy())
                 self.available_rare_pets = available_pets.get('rare', global_rare_pets.copy())
@@ -71,6 +83,7 @@ class Game:
             if (self.upgrade_pack == 0 and self.legendary_upgrade_pack == 0 and 
                 self.charakter_pack == 0 and self.buff_pack == 0):
                 self.reroll_shop()
+            
         else:
             self.money = 50000
             self.stage = 1
@@ -82,6 +95,7 @@ class Game:
             self.buff_pack = 0
             self.pending_buff_choices = []
             
+
             self.pet_levels["T-Rex"] = 1
             if "T-Rex" in self.available_prehistoric_pets:
                 self.available_prehistoric_pets.remove("T-Rex")
@@ -89,7 +103,7 @@ class Game:
             
             self.reroll_shop()
             push_state(self.username, self)
-
+    
     def roll_packs(self, anzahl, chance):
         return sum(1 for _ in range(anzahl) if random.randint(0, chance) == 1)
     
@@ -99,7 +113,12 @@ class Game:
         self.charakter_pack = self.roll_packs(3, 9)
         self.buff_pack = self.roll_packs(10, 2)
 
+
+
     def get_state(self, message=""):
+        inventory_details = []
+        inventory_details = []
+
         inventory_details = []
         for pet_name in self.inventory:
             if pet_name in self.all_pet_stats:
@@ -117,6 +136,7 @@ class Game:
             "money": self.money,
             "stage": self.stage,
             "inventory": inventory_details,
+            
             "shop": {
                 "upgrade_pack": self.upgrade_pack,
                 "buff_pack": self.buff_pack,
@@ -217,6 +237,8 @@ class Game:
                 message = "Game saved successfully."
             else:
                 message = "Failed to save game."
+        elif action == "afk-money":
+            self.money += 3
         elif action == "sell_all_pets":
                 if self.inventory:
                     total_sell_value = 0
