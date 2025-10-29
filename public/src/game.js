@@ -313,18 +313,19 @@ function generateSecurityToken() {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
-
+// WICHTIG: Token-Validierung hinzufügen
 function sendAfkMoney(token) {
-    
+    // Prüfe ob der Aufruf legitim ist
     if (token !== timerSecurityToken) {
         console.error('Unauthorized call detected');
         return;
     }
     
-   
+    // Token nach Verwendung ungültig machen (NACH der Prüfung, aber VOR dem WebSocket-Send)
+    const validToken = timerSecurityToken;
     timerSecurityToken = null;
     
-    
+    // Eigentliche Funktion
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('afk-money');
         console.log('afk-money gesendet');
@@ -359,6 +360,7 @@ function loadTimerFromCookie() {
         const timeElapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
         let calculatedValue = parseInt(savedValue) - timeElapsed;
         
+        // FIX: Generiere Token VOR jedem Aufruf in der Schleife
         while (calculatedValue <= 0) {
             timerSecurityToken = generateSecurityToken();
             sendAfkMoney(timerSecurityToken);

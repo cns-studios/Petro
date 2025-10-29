@@ -238,7 +238,7 @@ class Game:
             else:
                 message = "Failed to save game."
         elif action == "afk-money":
-            self.money += 1
+            self.money += 3
         elif action == "sell_all_pets":
                 if self.inventory:
                     total_sell_value = 0
