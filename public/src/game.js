@@ -286,9 +286,7 @@ const TIMER_DURATION = 500;
 let timerValue = TIMER_DURATION;
 let timerInterval = null;
 
-
 const timerEl = document.getElementById('timer');
-
 
 function setCookie(name, value, days = 365) {
     const date = new Date();
@@ -308,8 +306,25 @@ function getCookie(name) {
     return null;
 }
 
+// Security token to prevent abuse
+let timerSecurityToken = null;
 
-function sendAfkMoney() {
+function generateSecurityToken() {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+
+function sendAfkMoney(token) {
+    
+    if (token !== timerSecurityToken) {
+        console.error('Unauthorized call detected');
+        return;
+    }
+    
+   
+    timerSecurityToken = null;
+    
+    
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('afk-money');
         console.log('afk-money gesendet');
@@ -318,7 +333,6 @@ function sendAfkMoney() {
     }
 }
 
-// Timer-Funktion
 function updateTimer() {
     timerValue--;
     
@@ -326,18 +340,16 @@ function updateTimer() {
         timerEl.textContent = timerValue;
     }
     
- 
     setCookie('afk_timer_value', timerValue);
     setCookie('afk_timer_timestamp', Date.now());
     
-
     if (timerValue <= 0) {
-        sendAfkMoney();
+        timerSecurityToken = generateSecurityToken();
+        sendAfkMoney(timerSecurityToken);
         timerValue = TIMER_DURATION; 
         setCookie('afk_timer_value', timerValue);
     }
 }
-
 
 function loadTimerFromCookie() {
     const savedValue = getCookie('afk_timer_value');
@@ -347,10 +359,9 @@ function loadTimerFromCookie() {
         const timeElapsed = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
         let calculatedValue = parseInt(savedValue) - timeElapsed;
         
-        
         while (calculatedValue <= 0) {
-            
-            sendAfkMoney();
+            timerSecurityToken = generateSecurityToken();
+            sendAfkMoney(timerSecurityToken);
             calculatedValue += TIMER_DURATION;
         }
         
@@ -360,29 +371,23 @@ function loadTimerFromCookie() {
     return TIMER_DURATION;
 }
 
-
 function startTimer() {
- 
     if (timerInterval) {
         clearInterval(timerInterval);
     }
     
-   
     timerValue = loadTimerFromCookie();
     
     if (timerEl) {
         timerEl.textContent = timerValue;
     }
     
-
     timerInterval = setInterval(updateTimer, 1000);
 }
-
 
 window.addEventListener('load', () => {
     startTimer();
 });
-
 
 function stopTimer() {
     if (timerInterval) {
@@ -396,9 +401,12 @@ window.addEventListener('beforeunload', () => {
     setCookie('afk_timer_timestamp', Date.now());
 });
 
-
 const TIMEZONE_OFFSET_HOURS = 1;
 const ROTATION_INTERVAL_HOURS = 24;
+
+
+
+
 
 function getPetOfTheDay() {
     const now = new Date();
