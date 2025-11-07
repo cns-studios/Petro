@@ -1,5 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@media (max-width: 1200px) {
+    #play-btn {
+        font-size: 60px;
+        padding: 15px 30px;
+    }
+    
+    #pet_of_the_day {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    #play-btn {
+        font-size: 40px;
+        padding: 12px 24px;
+    }
+    
+    #pet-of-the-day-container {
+        top: 25%;
+    }
+    
+    #pet_of_the_day {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    #play-btn {
+        font-size: 30px;
+        padding: 10px 20px;
+    }
+    
+    #pet-of-the-day-container {
+        top: 20%;
+    }
+    
+    #pet_of_the_day {
+        width: 150px;
+    }
+}
+
 :root {
   --btn-base-color: #582630;
   --btn-light-color: #92612a;
@@ -826,11 +867,15 @@ header h1 {
 #pet-of-the-day-container {
     position: fixed;
     top: 30%;
-    right: 42%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #pet_of_the_day {
     animation: float 3s ease-in-out infinite;
+    width: 300px;
+    height: auto;
+    image-rendering: pixelated;
 }
 
 @keyframes float {
