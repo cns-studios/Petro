@@ -6,10 +6,20 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 const fs = require('fs')
+const dotenv = require('dotenv');
+dotenv.config();
 
 const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
+
+try {
+    global.DevMode = process.env.DEV_MODE;
+    console.log(`[Server] Dev mode: ${DevMode}`);
+} catch (error) {
+    global.DevMode = false;
+}
+
 
 // Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
 const wss = new WebSocket.Server({ noServer: true });
@@ -104,7 +114,25 @@ app.post('/signup', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, pin } = req.body;
-    if (!username || !pin) {
+    if (DevMode && username === 'dev') {
+        try {
+            db.run("DELETE FROM users WHERE username='dev'");
+            db.run("INSERT INTO users (username, pin) VALUES ('dev', '0')", function(err) {
+                if (err) {
+                    console.error('Signup error:', err.message);
+                }
+                console.log(`[Server] New user created: ${username}`);
+            });
+        } catch {
+            db.run("INSERT INTO users (username, pin) VALUES ('dev', '0')", function(err) {
+                if (err) {
+                    console.error('Signup error:', err.message);
+                }
+                console.log(`[Server] New user created: ${username}`);
+            });
+        }
+    } 
+    else if (!username) {
         return res.status(400).json({ message: 'Username and PIN are required.' });
     }
 
@@ -115,11 +143,12 @@ app.post('/login', (req, res) => {
         }
         if (row) {
             console.log(`[Server] User logged in: ${username}`);
-            res.status(200).json({ message: 'Login successful.' });
+            return res.status(200).json({ message: 'Login successful.' });
         } else {
-            res.status(401).json({ message: 'Invalid username or PIN.' });
+            return res.status(401).json({ message: 'Invalid username or PIN.' });
         }
     });
+    
 });
 
 app.post('/shutdown', (req, res) => {
