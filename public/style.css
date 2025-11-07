@@ -1,5 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+@media (max-width: 1200px) {
+    #play-btn {
+        font-size: 60px;
+        padding: 15px 30px;
+    }
+    
+    #pet_of_the_day {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    #play-btn {
+        font-size: 40px;
+        padding: 12px 24px;
+    }
+    
+    #pet-of-the-day-container {
+        top: 25%;
+    }
+    
+    #pet_of_the_day {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    #play-btn {
+        font-size: 30px;
+        padding: 10px 20px;
+    }
+    
+    #pet-of-the-day-container {
+        top: 20%;
+    }
+    
+    #pet_of_the_day {
+        width: 150px;
+    }
+}
+
 :root {
   --btn-base-color: #582630;
   --btn-light-color: #92612a;
@@ -535,6 +576,13 @@ header h1 {
     font-size: 0.8rem;
 }
 
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #money {
     color: #ffdd0f;
     font-weight: bold;
@@ -548,10 +596,28 @@ header h1 {
     color: #ffdd0f;
     font-size: 2rem;
     font-family: 'Press Start 2P', monospace;
+    display: block;
 }
 
 .money-symbol {
     font-family: 'Press Start 2P', monospace;
+}
+
+.timer-container {
+    margin-top: 10px;
+    color: #ffe11f;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    display: block;
+}
+
+.timer-label {
+    color: #d8cd00;
+}
+
+#timer {
+    color: hsl(57, 100%, 42%);
+    font-weight: bold;
 }
 
 #message-container {
@@ -701,7 +767,7 @@ header h1 {
 
 #goto-settings {
     left: 190px;
-    top: 2px;
+    top: -20px;
 }
 
 #goto-settings img.settings-icon {
@@ -781,5 +847,42 @@ header h1 {
     
     .shop-btn-stock {
         text-align: center;
+    }
+}
+
+#play-btn {  
+    font-size: 80px;
+    bottom: 10px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 20px 40px;
+}
+
+#play-btn:hover {
+    background-color: var(--btn-light-color);
+    transform: translateX(-50%) translate(0, calc(-1 * var(--pixel-size)));
+}
+
+#pet-of-the-day-container {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#pet_of_the_day {
+    animation: float 3s ease-in-out infinite;
+    width: 300px;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
     }
 }
