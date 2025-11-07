@@ -116,14 +116,15 @@ app.post('/login', (req, res) => {
     const { username, pin } = req.body;
     if (DevMode && username === 'dev') {
         try {
-            db.run("UPDATE users SET game_state = NULL WHERE username = 'dev'",  (err) => {
+            db.run("DELETE FROM users WHERE username='dev'");
+            db.run("INSERT INTO users (username, pin) VALUES ('dev', '0')", function(err) {
                 if (err) {
-                    console.error('Login error:', err.message);
+                    console.error('Signup error:', err.message);
                 }
-                console.log(`[Server] User logged in: ${username}`);
+                console.log(`[Server] New user created: ${username}`);
             });
         } catch {
-            db.run("INSERT INTO users (username, pin) VALUES ('dev', '')", function(err) {
+            db.run("INSERT INTO users (username, pin) VALUES ('dev', '0')", function(err) {
                 if (err) {
                     console.error('Signup error:', err.message);
                 }
@@ -131,7 +132,7 @@ app.post('/login', (req, res) => {
             });
         }
     } 
-    else if (!username || !pin) {
+    else if (!username) {
         return res.status(400).json({ message: 'Username and PIN are required.' });
     }
 
