@@ -15,7 +15,6 @@ const connectionAttempts = new Map();
 const app = express();
 const server = http.createServer(app);
 
-const devMode = true;
 
 
 // Create ws servers with da noServer option bc stackoverflow told me so (no idea what ts does)
