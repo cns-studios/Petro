@@ -6,7 +6,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 const fs = require('fs');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -109,10 +109,7 @@ app.post('/signup', async (req, res) => {
         return res.status(400).json({ message: 'Username is required.' });
     }
     for (let i = 0; i < bannedNames.length; i++) {
-        if (username.toLowerCase().includes(bannedNames[i])) {
-            if (devMode && username.startsWith('dev_')) {
-                continue;
-            }
+        if (username.toLowerCase() === bannedNames[i]) {
             console.log(`[Server] User ${username} is banned.`);
             return res.status(400).json({ message: 'Username is banned.' });
         }
